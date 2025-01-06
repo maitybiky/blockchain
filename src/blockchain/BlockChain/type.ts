@@ -1,4 +1,3 @@
-import { IAccountModel } from "../../AccountModel/type";
 import { IBlock } from "../Block/types";
 
 // Interface for the blockchain
@@ -8,11 +7,10 @@ export interface IBlockchain {
   getChain(): IBlock[];
   isValid(): boolean;
   getLatestBlock(): IBlock | Pick<IBlock, "hash">;
-  difficulty: number;
-  nonce: number;
+  getDifficulty(): number;
+  getNonce(): number;
 }
 export type BlockChainArg = {
-  account: IAccountModel;
   difficulty: number;
   nonce: number;
 };

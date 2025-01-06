@@ -1,4 +1,3 @@
-
 import { ITransaction } from "../Transaction/type";
 
 export interface IBlock {
@@ -19,10 +18,6 @@ export type BlockArg = {
   index: number;
   timestamp: number;
   transactions: ITransaction[];
-  previousHash: string | null;
-  nonce: number;
-  difficulty: number;
-
 };
 export type VerifyReturn = {
   transactions: ITransaction[];

@@ -49,32 +49,6 @@ async function exportKeyToBase64(
   }
 }
 
-export async function signData(
-  privateKeyBase64: string,
-  data: string
-): Promise<Uint8Array> {
-  try {
-    const privateKey = await importPrivateKey(privateKeyBase64);
-
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data);
-
-    const signature = await window.crypto.subtle.sign(
-      {
-        name: "RSA-PSS",
-        saltLength: 32,
-      },
-      privateKey,
-      dataBuffer
-    );
-
-    return new Uint8Array(signature);
-  } catch (error) {
-    console.error("Error signing data:", error);
-    throw error; // Re-throw the error to be handled by the caller
-  }
-}
-
 async function importPrivateKey(base64: string): Promise<CryptoKey> {
   try {
     const binaryDerString = atob(base64); // Decode base64 to binary string
@@ -99,13 +73,39 @@ async function importPrivateKey(base64: string): Promise<CryptoKey> {
     throw error; // Re-throw the error to be handled by the caller
   }
 }
+export async function signData(
+  privateKeyBase64: string,
+  data: string
+): Promise<Uint8Array> {
+  try {
+    console.log('data', data)
+    const privateKey = await importPrivateKey(privateKeyBase64);
 
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+
+    const signature = await window.crypto.subtle.sign(
+      {
+        name: "RSA-PSS",
+        saltLength: 32,
+      },
+      privateKey,
+      dataBuffer
+    );
+
+    return new Uint8Array(signature);
+  } catch (error) {
+    console.error("Error signing data:", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
+}
 export async function verifySignature(
   publicKeyBase64: string,
   data: string,
   signature: Uint8Array
 ): Promise<boolean> {
   try {
+    console.log('verify data', data)
     const publicKey = await importPublicKey(publicKeyBase64);
 
     const encoder = new TextEncoder();

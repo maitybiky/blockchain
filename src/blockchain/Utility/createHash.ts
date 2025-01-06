@@ -1,4 +1,4 @@
-async function createHash(obj: any): Promise<string> {
+export async function createHash(obj: any): Promise<string> {
   try {
     // Step 1: Convert the object to a JSON string
     const jsonString = JSON.stringify(obj);
@@ -21,5 +21,13 @@ async function createHash(obj: any): Promise<string> {
     throw error;
   }
 }
-
-export default createHash;
+export async function verifyHash({
+  hash,
+  obj,
+}: {
+  hash: string;
+  obj: any;
+}): Promise<boolean> {
+  const recomputeHash = await createHash(obj);
+  return hash === recomputeHash;
+}

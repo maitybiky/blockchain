@@ -1,28 +1,24 @@
 import Account from "./AccountModel";
 import Block from "./blockchain/Block";
 import Blockchain from "./blockchain/BlockChain";
+import Mempool from "./blockchain/Mempool";
 import Transaction from "./blockchain/Transaction";
-import { getAccountKey } from "./blockchain/Utility/getAccountKey";
 import Wallet from "./blockchain/Wallet";
 import { IWallet } from "./blockchain/Wallet/type";
 import "./style.css";
-const account = new Account();
+
+const account = Account.getTheAccount();
+const mempool = Mempool.getTheMemPool();
+const blockchain = Blockchain.getBlockChain();
 
 const main = async () => {
   try {
-    var blockchain = new Blockchain({ difficulty: 10, nonce: 111, account });
     console.log("Welcome TO BC");
 
     const genesis = new Wallet("genesis");
     await genesis.active();
 
-    const genesisWalletId = await getAccountKey(genesis.getPublicKey());
-    account.creditCoin({
-      walletId: genesisWalletId,
-      amount: 1000,
-    });
-
-    console.log("ACCCC :>> ", account.getAllWalletBalance());
+    console.log("Current Accounts :>> ", account.getAllWalletBalance());
 
     const surajit = new Wallet("surajit");
     await surajit.active();
@@ -30,6 +26,7 @@ const main = async () => {
     await biky.active();
     const rock = new Wallet("rock");
     await rock.active();
+    account.getAllWalletBalance();
 
     // split money from air
     // await blockchain.pushGenesisBlock(genesis);
@@ -42,8 +39,6 @@ const main = async () => {
       receiver: IWallet;
       amount: number;
     }) => {
-      console.log("sender :>> ", sender);
-      console.log("receiver :>> ", receiver);
       try {
         const createTransactionRequest = new Transaction({
           amount: amount,
@@ -52,17 +47,7 @@ const main = async () => {
           sender: sender.getPublicKey(),
         });
         await createTransactionRequest.signTransaction(sender.getPrivateKey());
-
-        const block = new Block({
-          difficulty: blockchain.difficulty,
-          nonce: blockchain.nonce,
-          index: Date.now(),
-          previousHash: blockchain.getLatestBlock().hash,
-          timestamp: Date.now(),
-          transactions: [createTransactionRequest],
-        });
-        await block.mine();
-        await blockchain.addBlock(block);
+        mempool.addTransaction(createTransactionRequest);
       } catch (error) {
         throw error;
       }
@@ -75,7 +60,6 @@ const main = async () => {
       });
     });
     await Promise.all(trPromise);
-    console.log("XXX :>> ", account.getAllWalletBalance());
 
     // biky send 20 to shopkeeper rock
     await INIT_TRANSACTION({
@@ -83,21 +67,60 @@ const main = async () => {
       receiver: rock,
       amount: 20,
     });
-    console.log("account :>> ", account.getAllWalletBalance());
+  } catch (error) {
+    console.error("error :>> ", error);
+  }
+};
 
-    // User Interface
+async function processMempool() {
+  try {
+    const memPoolSize = mempool.getSize();
 
+    if (memPoolSize) {
+      console.log("Mempool initiated");
+      const mempoolProcesses = mempool
+        .getAllTransactions()
+        .map(async (transaction) => {
+          const block = new Block({
+            index: Date.now(),
+            timestamp: Date.now(),
+            transactions: [transaction],
+          });
+
+          await block.mine();
+
+          await blockchain.addBlock(block);
+        });
+
+      await Promise.all(mempoolProcesses)
+        .then(() => {
+          mempool.clearMempool();
+        })
+        .catch((err) => {
+          throw err;
+        });
+    }
+  } catch (error) {
+    throw error;
+  } finally {
+    // Resume after 5 seconds
+    setTimeout(processMempool, 5000);
+  }
+}
+
+main().then(async () => {
+  try {
+    await processMempool();
     const transactions: string[] = [];
     blockchain.getChain().forEach((block) => {
+      console.log("first", block);
       block.getTransaction().forEach((transaction) => {
         transactions.push(
-          `<button id="counter" type="button">${transaction.sender.slice(
-            0,
-            5
-          )}  - ${transaction.amount} - ${transaction.receiver.slice(
-            0,
-            5
-          )} </button>`
+          `<button id="counter" type="button">${transaction
+            .getSender()
+            .slice(0, 5)}  - ${transaction.getAmount()} - ${transaction
+            .getReceiver()
+            .slice(0, 5)} </button>`
         );
       });
     });
@@ -109,10 +132,7 @@ const main = async () => {
     </div>
   </div>
 `;
-    blockchain.getBalanceSet();
-    console.log(account.getAllWalletBalance());
   } catch (error) {
-    console.log("error :>> ", error);
+    console.log("MemPool error", error);
   }
-};
-main();
+});

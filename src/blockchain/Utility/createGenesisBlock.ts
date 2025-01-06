@@ -16,10 +16,8 @@ export const createGenesisBlock = async (
     });
     await genesisTransaction.signTransaction(wallet.getPrivateKey());
     const genesisBlock = new Block({
-      difficulty: 10,
       index: Date.now(),
-      nonce: 111,
-      previousHash,
+
       timestamp: Date.now(),
       transactions: [genesisTransaction],
     });

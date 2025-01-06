@@ -1,3 +1,4 @@
+import Account from "../../AccountModel";
 import { ITransaction } from "../Transaction/type";
 import { generateKeyPair } from "../Utility/crypto";
 import { getAccountKey } from "../Utility/getAccountKey";
@@ -38,6 +39,8 @@ class Wallet implements IWallet {
       this.privateKey = keyPair.privateKey;
       this.publicKey = keyPair.publicKey;
       this.walletId = await this.genWalletId(this.publicKey);
+      
+      Account.getTheAccount().createAccount(this);
     } catch (error) {
       throw error;
     }

@@ -1,6 +1,7 @@
 import Account from "../../AccountModel";
+import Blockchain from "../BlockChain";
 import { ITransaction } from "../Transaction/type";
-import createHash from "../Utility/createHash";
+import { createHash } from "../Utility/createHash";
 import { verifySignature } from "../Utility/crypto";
 
 import { BlockArg, IBlock } from "./types";
@@ -20,11 +21,10 @@ class Block implements IBlock {
     this.index = data.index;
     this.timestamp = data.timestamp;
     this.transactions = data.transactions;
-    this.previousHash = data.previousHash;
-    this.nonce = data.nonce;
-    this.difficulty = data.difficulty;
+    this.previousHash = null;
+    this.nonce = Blockchain.getBlockChain().getNonce();
+    this.difficulty = Blockchain.getBlockChain().getDifficulty();
     this.hash = null;
-    this.genrateHash();
   }
 
   private async genrateHash(): Promise<string> {
@@ -37,24 +37,19 @@ class Block implements IBlock {
   }
   private async verifyTransactions(): Promise<ITransaction[]> {
     try {
-      if (!this.transactions.every((it) => it.signature))
+      if (!this.transactions.every((it) => it.getSignature()))
         throw new Error("Signature not found");
 
       const verifyPromise = this.transactions.map(async (transaction) => {
-        if (transaction.signature) {
-          const data = {
-            sender: transaction.sender,
-            receiver: transaction.receiver,
-            timestamp: transaction.timestamp,
-            hash: transaction.hash,
-            amount: transaction.amount,
-          };
+        const transactionSigntaure = transaction.getSignature();
+        if (transactionSigntaure) {
+          const data = transaction.toString();
           return {
             transaction,
             status: await verifySignature(
-              transaction.sender,
-              JSON.stringify(data),
-              transaction.signature
+              transaction.getSender(),
+              data,
+              transactionSigntaure
             ),
           };
         }
@@ -62,25 +57,52 @@ class Block implements IBlock {
       const verifyStatus = (await Promise.all(verifyPromise)).filter(
         (it) => it != undefined
       );
-      return verifyStatus
-        .filter((it) => it?.status && it.transaction)
-        .map((result) => result?.transaction);
+      const signatureVerified: ITransaction[] = [];
+      const signatureFailed: ITransaction[] = [];
+
+      verifyStatus.map((txState) => {
+        if (txState.status) {
+          signatureVerified.push(txState.transaction);
+        } else {
+          signatureFailed.push(txState.transaction);
+        }
+      });
+
+      signatureFailed.forEach((it) => {
+        console.error("Signature Failed", it.getHash());
+      });
+
+      return signatureVerified;
     } catch (error) {
       throw error;
     }
   }
   private verifyBalance(): ITransaction[] {
-    const accounts = new Account();
-    const verifiedTransactions = this.transactions.filter((transaction) => {
-      return (
-        transaction.amount >= accounts.getWalletBalance(transaction.sender)
-      );
+    const accounts = Account.getTheAccount();
+
+    const verifiedTransactions: ITransaction[] = [];
+    const InsufficientTransaction: ITransaction[] = [];
+    this.transactions.map((transaction) => {
+      if (
+        transaction.getAmount() >=
+        accounts.getWalletBalance(transaction.getSender())
+      ) {
+        verifiedTransactions.push(transaction);
+      } else {
+        InsufficientTransaction.push(transaction);
+      }
+    });
+    InsufficientTransaction.forEach((t) => {
+      console.error("Insufficient Amount", t);
     });
     return verifiedTransactions;
   }
   async mine() {
     try {
-      this.transactions = this.verifyBalance();
+      const verifiedTransactions = this.verifyBalance();
+
+      this.transactions = verifiedTransactions;
+
       this.transactions = await this.verifyTransactions();
       const h = await this.genrateHash();
       this.hash = h;
