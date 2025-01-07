@@ -1,5 +1,6 @@
 import Account from "../../AccountModel";
 import { IAccountModel } from "../../AccountModel/type";
+import { updateChain } from "../../blockchainstate";
 import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
 
@@ -13,7 +14,7 @@ class Blockchain implements IBlockchain {
   private difficulty: number;
   private nonce: number;
 
-  private constructor({ difficulty, nonce }: BlockChainArg) {
+  constructor({ difficulty, nonce }: BlockChainArg) {
     this.chain = [];
     this.difficulty = difficulty;
     this.nonce = nonce;
@@ -60,6 +61,7 @@ class Blockchain implements IBlockchain {
           newBlock.previousHash = this.getLatestBlock().hash;
           // newBlock.
           this.chain.push(newBlock);
+          updateChain(this.chain)
           console.log("this.account", this.account);
         } catch (error) {
           throw error;

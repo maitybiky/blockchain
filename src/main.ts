@@ -67,6 +67,11 @@ const main = async () => {
       receiver: rock,
       amount: 20,
     });
+    await INIT_TRANSACTION({
+      sender: rock,
+      receiver: surajit,
+      amount: 78,
+    });
   } catch (error) {
     console.error("error :>> ", error);
   }
