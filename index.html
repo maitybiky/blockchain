@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,68 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="dynamic"></div>
+      <div class="container">
+        <h2>WebRTC Peer Connection</h2>
+
+        <!-- Form for creating an offer -->
+        <div class="input-group">
+          <button id="createOfferBtn">Create Offer</button>
+        </div>
+
+        <!-- Form for connecting to a peer with the received offer -->
+        <div class="input-group">
+          <label for="offerInput">Enter Offer (from Peer 1)</label>
+          <textarea
+            id="offerInput"
+            placeholder="Paste the offer here"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="input-group">
+          <label for="candidatesInput"
+            >Enter ICE Candidates (from Peer 1)</label
+          >
+          <textarea
+            id="candidatesInput"
+            placeholder="Paste ICE candidates here"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="input-group">
+          <button id="connectBtn">Connect to Peer</button>
+        </div>
+
+        <div id="connectionStatus"></div>
+      </div>
+
+      <script>
+        const createOfferBtn = document.getElementById("createOfferBtn");
+        const connectBtn = document.getElementById("connectBtn");
+        const offerInput = document.getElementById("offerInput");
+        const candidatesInput = document.getElementById("candidatesInput");
+        const connectionStatus = document.getElementById("connectionStatus");
+
+        // Assuming these functions are defined in the previous code
+        createOfferBtn.addEventListener("click", async () => {
+          await initNetwork();
+          connectionStatus.textContent = "Offer created. Share it with Peer 2.";
+        });
+
+        connectBtn.addEventListener("click", async () => {
+          const offer = JSON.parse(offerInput.value);
+          const remoteCandidates = JSON.parse(candidatesInput.value);
+
+          await connectToPeer(offer, remoteCandidates);
+          connectionStatus.textContent = "Connected to Peer 1.";
+        });
+      </script>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/Network/peer.ts"></script>
   </body>
 </html>
