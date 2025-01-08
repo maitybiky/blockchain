@@ -5,7 +5,8 @@ import Mempool from "./blockchain/Mempool";
 import Transaction from "./blockchain/Transaction";
 import Wallet from "./blockchain/Wallet";
 import { IWallet } from "./blockchain/Wallet/type";
-import { initNetwork } from "./Network/peer";
+import connectToNetwork from "./Network/peer.js";
+
 import "./style.css";
 
 const account = Account.getTheAccount();
@@ -142,4 +143,4 @@ async function processMempool() {
 //     console.log("MemPool error", error);
 //   }
 // });
-initNetwork()
+connectToNetwork()

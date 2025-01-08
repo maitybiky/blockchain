@@ -1,91 +1,109 @@
-export const initNetwork = async () => {
-  let localPeerConnection;
-  let localDataChannel;
+function connectToNetwork() {
+  const peerConnections: any = {}; // To store connections with other peers
+  const signalingServer = new WebSocket("ws://localhost:8080");
+  const dataChannels: Record<string, RTCDataChannel> = {};
+  let myPeerId: string | null;
+  signalingServer.onmessage = async (message) => {
+    const data = JSON.parse(message.data);
+ 
+console.log('from signalling sever', data)
+    if (data.type === "peer_coonection") {
+      // Server assigns a unique ID to this peer
+      myPeerId = data.id;
+      console.log("Available peers:", data.peers);
+      for (const peerId of data.peers) {
+        if (peerId !== myPeerId) {
+          connectToPeer(peerId); // Connect to existing peers
+        }
+      }
+    } else if (data.type === "offer") {
+      // Received an offer from another peer
+      console.log('data', data)
+      const pc = createPeerConnection(data.from);
+      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
 
-  // Create a new RTCPeerConnection
-  localPeerConnection = new RTCPeerConnection();
-
-  // Create a data channel
-  localDataChannel = localPeerConnection.createDataChannel("messageChannel");
-
-  localDataChannel.onopen = () => console.log("Data channel opened");
-  localDataChannel.onmessage = (event) => {
-    console.log("Message from remote peer:", event.data);
-  };
-
-  // Set up ICE candidate handling
-  localPeerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      sendIceCandidate(event.candidate);
+      signalingServer.send(
+        JSON.stringify({
+          type: "answer",
+          to: data.from,
+          answer: pc.localDescription,
+        })
+      );
+    } else if (data.type === "answer") {
+      // Received an answer to our offer
+      const pc = peerConnections[data.from];
+      await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+    } else if (data.type === "candidate") {
+      // Received an ICE candidate
+      const pc = peerConnections[data.from];
+      if (pc) {
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+      }
     }
   };
 
-  // Create an offer and set the local description
-  const offer = await localPeerConnection.createOffer();
-  await localPeerConnection.setLocalDescription(offer);
-  console.log("Offer created:", offer);
+  function createPeerConnection(peerId: string) {
+    const pc = new RTCPeerConnection();
 
-  // Send the offer to the remote peer (manually)
-  sendOffer(offer);
-
-  function sendOffer(offer: any) {
-    // Example: You would manually send this offer to the other peer via a different channel
-    console.log("Send this offer to the other peer:", offer);
-  }
-
-  function sendIceCandidate(candidate: any) {
-    // Example: You would manually send this ICE candidate to the other peer
-    console.log("Send this ICE candidate to the other peer:", candidate);
-  }
-};
-
-export const connectToPeer = async (offer: any, remoteCandidates: any) => {
-  let remotePeerConnection;
-  let remoteDataChannel;
-
-  remotePeerConnection = new RTCPeerConnection();
-
-  // Handle the received offer
-  await remotePeerConnection.setRemoteDescription(
-    new RTCSessionDescription(offer)
-  );
-
-  // Create an answer to send back
-  const answer = await remotePeerConnection.createAnswer();
-  await remotePeerConnection.setLocalDescription(answer);
-  console.log("Answer created:", answer);
-
-  // Send the answer back to Peer 1 (manually)
-  sendAnswer(answer);
-
-  function sendAnswer(answer: any) {
-    // Example: You would manually send this answer back to Peer 1
-    console.log("Send this answer to Peer 1:", answer);
-  }
-
-  // Handle ICE candidate
-  remotePeerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      sendIceCandidate(event.candidate);
-    }
-  };
-
-  // Set up data channel
-  remotePeerConnection.ondatachannel = (event) => {
-    remoteDataChannel = event.channel;
-    remoteDataChannel.onopen = () => console.log("Data channel opened");
-    remoteDataChannel.onmessage = (event) => {
-      console.log("Message from Peer 1:", event.data);
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
+        signalingServer.send(
+          JSON.stringify({
+            type: "candidate",
+            to: peerId,
+            candidate: event.candidate,
+          })
+        );
+      }
     };
-  };
 
-  // Add received ICE candidates to the remote connection
-  remoteCandidates.forEach((candidate: any) => {
-    remotePeerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-  });
+    pc.ondatachannel = (event) => {
+      const dataChannel = event.channel;
+      dataChannels[peerId] = dataChannel;
 
-  function sendIceCandidate(candidate: any) {
-    // Example: You would manually send this ICE candidate to Peer 1
-    console.log("Send this ICE candidate to Peer 1:", candidate);
+      dataChannel.onmessage = (e) => {
+        console.log("Received message:", e.data);
+      };
+    };
+
+    const dataChannel = pc.createDataChannel("mesh");
+    dataChannel.onopen = () => console.log("Data channel open");
+    dataChannel.onmessage = (e) => console.log("Received message:", e.data);
+
+    peerConnections[peerId] = pc;
+    return pc;
   }
-};
+
+  async function connectToPeer(peerId: string) {
+    console.log('peerId', peerId)
+    const pc = createPeerConnection(peerId);
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    signalingServer.send(
+      JSON.stringify({
+        type: "offer",
+        to: peerId,
+        offer: pc.localDescription,
+      })
+    );
+  }
+  setTimeout(() => {
+    broadcastData("hello")
+  }, 5000);
+  function broadcastData(message: string) {
+    for (const peerId in dataChannels) {
+      const dataChannel = dataChannels[peerId];
+      if (dataChannel.readyState === "open") {
+        dataChannel.send(message);
+        console.log(`Sent message to ${peerId}:`, message);
+      } else {
+        console.log(`Data channel with ${peerId} is not open`);
+      }
+    }
+  }
+}
+
+export default connectToNetwork;
