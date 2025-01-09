@@ -1,14 +1,19 @@
+import { logCurrentTime } from "../utility";
 import { dataChannels, peerConnections, signalingServer } from "./peer";
+import { receiveRequest } from "./receiveRequest";
+import { getChainReq } from "./sendRequests";
 
 function createPeerConnection(peerId: string) {
   const pc = new RTCPeerConnection();
 
   pc.onicecandidate = (event) => {
     if (event.candidate) {
+      logCurrentTime("send candidate");
+
       signalingServer.send(
         JSON.stringify({
           type: "candidate",
-          from: peerId,
+          to: peerId,
           candidate: event.candidate,
         })
       );
@@ -25,11 +30,11 @@ function createPeerConnection(peerId: string) {
   };
 
   const dataChannel = pc.createDataChannel("mesh");
-  dataChannel.onopen = () => console.log("Data channel open");
-  dataChannel.onmessage = (e) => console.log("Received message:", e.data);
+  dataChannel.onopen = () => {};
+  dataChannel.onmessage = (e) => receiveRequest(e,dataChannels);
 
   peerConnections[peerId] = pc;
   return pc;
 }
 
-export default createPeerConnection
+export default createPeerConnection;
