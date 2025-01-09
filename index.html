@@ -9,38 +9,7 @@
   <body>
     <div id="app">
       <div id="dynamic"></div>
-      <div class="container">
-        <h2>WebRTC Peer Connection</h2>
-
-        <!-- Form for creating an offer -->
-        <div class="input-group">
-          <button id="createOfferBtn">Create Offer</button>
-        </div>
-
-        <!-- Form for connecting to a peer with the received offer -->
-        <div class="input-group">
-          <label for="offerInput">Enter Offer (from Peer 1)</label>
-          <textarea
-            id="offerInput"
-            placeholder="Paste the offer here"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <div class="input-group">
-          <label for="candidatesInput"
-            >Enter ICE Candidates (from Peer 1)</label
-          >
-          <textarea
-            id="candidatesInput"
-            placeholder="Paste ICE candidates here"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <div class="input-group">
-          <button id="connectBtn">Connect to Peer</button>
-        </div>
+     
 
         <div id="connectionStatus"></div>
       </div>

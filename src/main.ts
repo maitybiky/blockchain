@@ -5,7 +5,7 @@ import Mempool from "./blockchain/Mempool";
 import Transaction from "./blockchain/Transaction";
 import Wallet from "./blockchain/Wallet";
 import { IWallet } from "./blockchain/Wallet/type";
-import connectToNetwork from "./Network/peer.js";
+import connectToNetwork from "./Network/peer/peer.js";
 
 import "./style.css";
 
