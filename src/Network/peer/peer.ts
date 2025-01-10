@@ -3,16 +3,18 @@ import createPeerConnection from "./createRemotePeerConnection";
 import { handleOfferReceive } from "./offer";
 import { getChainReq } from "./sendRequests";
 import { getConnection } from "../../state/getter";
+import networkStore from "../../state/store";
 
-let myPeerId: string | null;
 function connectToNetwork() {
+  const { myPeerId, setOwnPeerId } = networkStore.getState();
   signalingServer.onmessage = async (message) => {
     const data = JSON.parse(message.data);
 
     if (data.type === "peer_coonection") {
       // Server assigns a unique ID to this peer
-      myPeerId = data.id;
-      if (myPeerId) {
+      const youPeerId = data.id;
+      if (youPeerId) {
+        setOwnPeerId(youPeerId);
         console.log("who ami i :>> ", myPeerId);
         // connectToPeer(myPeerId);
       } else {

@@ -55,4 +55,4 @@ function generateRandomString(length) {
   return result;
 }
 
-console.log(`Signaling server is ${process.env.host}:${process.env.port}`);
+console.log(`Signaling server running on localhost:8080`)

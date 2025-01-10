@@ -2,7 +2,7 @@ import { getDataChannel } from "../../state/getter";
 import networkStore from "../../state/store";
 
 export const getChainReq = () => {
-  const { dataChannels,myPeerId } = networkStore();
+  const { dataChannels,myPeerId } = networkStore.getState();
   if (Object.entries(dataChannels).length === 0) {
     setTimeout(() => {
       getChainReq();

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { devtools } from "zustand/middleware";
 type Store = {
   myPeerId: string | undefined;
   setOwnPeerId: (peerId: string) => void;
@@ -12,36 +12,40 @@ type Store = {
   removeDataChannel: (peerId: string) => void;
 };
 
-const networkStore = create<Store>((set) => ({
-  myPeerId: undefined,
-  setOwnPeerId: (peerId: string) => set(() => ({ myPeerId: peerId })),
-  // Peer connections
-  peerConnections: {},
+const networkStore = create<Store>()(
+  devtools((set) => ({
+    myPeerId: undefined,
+    setOwnPeerId: (peerId: string) => set(() => ({ myPeerId: peerId })),
+    // Peer connections
+    peerConnections: {},
 
-  addConnection: (peerId, connection) =>
-    set((state) => ({
-      peerConnections: { ...state.peerConnections, [peerId]: connection },
-    })),
+    addConnection: (peerId, connection) => {
+      
+      return set((state) => ({
+        peerConnections: { ...state.peerConnections, [peerId]: connection },
+      }));
+    },
 
-  removeConnection: (peerId) =>
-    set((state) => {
-      const { [peerId]: _, ...updatedConnections } = state.peerConnections;
-      return { peerConnections: updatedConnections };
-    }),
+    removeConnection: (peerId) =>
+      set((state) => {
+        const { [peerId]: _, ...updatedConnections } = state.peerConnections;
+        return { peerConnections: updatedConnections };
+      }),
 
-  // Data channels
-  dataChannels: {},
+    // Data channels
+    dataChannels: {},
 
-  addDataChannel: (peerId, channel) =>
-    set((state) => ({
-      dataChannels: { ...state.dataChannels, [peerId]: channel },
-    })),
+    addDataChannel: (peerId, channel) =>
+      set((state) => ({
+        dataChannels: { ...state.dataChannels, [peerId]: channel },
+      })),
 
-  removeDataChannel: (peerId) =>
-    set((state) => {
-      const { [peerId]: _, ...updatedChannels } = state.dataChannels;
-      return { dataChannels: updatedChannels };
-    }),
-}));
+    removeDataChannel: (peerId) =>
+      set((state) => {
+        const { [peerId]: _, ...updatedChannels } = state.dataChannels;
+        return { dataChannels: updatedChannels };
+      }),
+  }))
+);
 
 export default networkStore;

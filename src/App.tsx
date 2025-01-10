@@ -1,10 +1,20 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import { useEffect } from "react";
+import networkStore from "./state/store";
 
 function App() {
- 
-
+  const { dataChannels, peerConnections } = networkStore();
+  useEffect(() => {
+    setTimeout(() => {
+      console.log(
+        "dataChannels, peerConnections :>> ",
+        dataChannels,
+        peerConnections
+      );
+    }, 5000);
+  });
   return (
     <>
       <div>
@@ -16,12 +26,12 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
-   
+
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

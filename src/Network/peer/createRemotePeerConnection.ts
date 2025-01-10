@@ -4,7 +4,7 @@ import { signalingServer } from "./peer";
 import { receiveRequest } from "./receiveRequest";
 
 function createPeerConnection(peerId: string) {
-  const { addConnection, addDataChannel } = networkStore();
+  const { addConnection, addDataChannel } = networkStore.getState()
   const pc = new RTCPeerConnection();
 
   pc.onicecandidate = (event) => {
