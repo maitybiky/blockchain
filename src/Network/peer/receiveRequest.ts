@@ -1,7 +1,7 @@
-export const receiveRequest = (
-  req: MessageEvent<any>,
-  dataChannels: Record<string, RTCDataChannel>
-) => {
+import networkStore from "../../state/store";
+
+export const receiveRequest = (req: MessageEvent<any>) => {
+  const { dataChannels } = networkStore();
   const msg = JSON.parse(req.data);
   console.log("msg", msg);
 

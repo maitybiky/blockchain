@@ -1,6 +1,8 @@
 const WebSocket = require("ws");
 
-const server = new WebSocket.Server({ port: 8080 });
+const server = new WebSocket.Server({
+  port: 8080,
+});
 const clients = [];
 const peers = [];
 
@@ -53,4 +55,4 @@ function generateRandomString(length) {
   return result;
 }
 
-console.log("Signaling server is running on ws://localhost:8080");
+console.log(`Signaling server is ${process.env.host}:${process.env.port}`);

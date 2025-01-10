@@ -2,6 +2,7 @@ import { logCurrentTime } from "../utility";
 import createPeerConnection from "./createRemotePeerConnection";
 import { handleOfferReceive } from "./offer";
 import { getChainReq } from "./sendRequests";
+import { getConnection } from "../../state/getter";
 
 let myPeerId: string | null;
 function connectToNetwork() {
@@ -32,14 +33,19 @@ function connectToNetwork() {
       logCurrentTime("rec answer");
 
       // Received an answer to our offer
-      const pc = peerConnections[data.to];
-      await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-      getChainReq(dataChannels);
+      const pc = getConnection(data.to);
+      if (pc) {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      } else {
+        console.error("peer not found!!!");
+      }
+      getChainReq();
     } else if (data.type === "candidate") {
       logCurrentTime("rec candidate");
 
       // Received an ICE candidate
-      const pc = peerConnections[data.to];
+      const pc = getConnection(data.to);
+
       if (pc) {
         await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
       }
@@ -61,9 +67,6 @@ function connectToNetwork() {
   }
 }
 export const signalingServer = new WebSocket("ws://localhost:8080");
-export const peerConnections: Record<string, RTCPeerConnection> = {}; // To store connections with other peers
-export const dataChannels: Record<string, RTCDataChannel> = {};
-export const getMyPeerId = () => myPeerId;
 export default connectToNetwork;
 
 //connectToPeer(peerId) - to initiate process of joining the mesh [it initate your own peer whit a peer id returned from signalling server]

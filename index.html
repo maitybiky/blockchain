@@ -1,43 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>Vite + React + TS</title>
   </head>
   <body>
-    <div id="app">
-      <div id="dynamic"></div>
-     
-
-        <div id="connectionStatus"></div>
-      </div>
-
-      <script>
-        const createOfferBtn = document.getElementById("createOfferBtn");
-        const connectBtn = document.getElementById("connectBtn");
-        const offerInput = document.getElementById("offerInput");
-        const candidatesInput = document.getElementById("candidatesInput");
-        const connectionStatus = document.getElementById("connectionStatus");
-
-        // Assuming these functions are defined in the previous code
-        createOfferBtn.addEventListener("click", async () => {
-          await initNetwork();
-          connectionStatus.textContent = "Offer created. Share it with Peer 2.";
-        });
-
-        connectBtn.addEventListener("click", async () => {
-          const offer = JSON.parse(offerInput.value);
-          const remoteCandidates = JSON.parse(candidatesInput.value);
-
-          await connectToPeer(offer, remoteCandidates);
-          connectionStatus.textContent = "Connected to Peer 1.";
-        });
-      </script>
-    </div>
-
+    <div id="root"></div>
     <script type="module" src="/src/main.ts"></script>
-    <script type="module" src="/src/Network/peer.ts"></script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
