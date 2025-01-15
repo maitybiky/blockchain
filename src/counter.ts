@@ -1,17 +1,17 @@
 type TPatriciaTrieNode = {
   prefix: string;
-  children: Map<string, TPatriciaTrieNode>;
+  children: TPatriciaTrieNode[];
   eow: boolean;
 };
 
 class PatriciaNode implements TPatriciaTrieNode {
   prefix: string;
-  children: Map<string, TPatriciaTrieNode>;
+  children: TPatriciaTrieNode[];
   eow: boolean;
 
   constructor(prefix = "") {
     this.prefix = prefix;
-    this.children = new Map();
+    this.children = [];
     this.eow = false;
   }
 }
@@ -21,35 +21,47 @@ class Trie {
   constructor() {
     this.root = new PatriciaNode();
   }
-  add(word: string, root = this.root, sublnt = 0) {
+  add(word: string, root = this.root) {
     let current = root || this.root;
-    const isLeaf = current.children.size === 0;
-    if (word == "pplication") {
-      console.log("current :>> ", current);
-    }
+    console.log("word :>> ", word);
 
     let isMatched = false;
     // if current root has children the sent the uncommon string to childs
-    current.children.forEach((value, key) => {
-      if (word.startsWith(key)) {
+    current.children.forEach((value) => {
+      const key = value.prefix;
+      const commonIndex = this.getCommonPrefixLength(key, word);
+      if (word === "application") {
+        console.log("commonIndex,value :>> ", commonIndex, key.length, value);
+      }
+      if (commonIndex > 0) {
+        // if new word have some common in the existing tree
         isMatched = true;
-        const commonIndex = this.getCommonPrefixLength(key, word);
-        const childWord = word.slice(commonIndex);
-        this.add(childWord, value, ++sublnt);
+
+        if (commonIndex < key.length) {
+          // if there any uncommon substring left , so add them to child list
+
+          const commonPrefix = key.slice(0, commonIndex);
+          const restKey = key.slice(commonIndex);
+
+          const restKeyNode = new PatriciaNode(restKey);
+
+          //change the matched child node
+          value.children.push(restKeyNode);
+          value.prefix = commonPrefix;
+        }
+
+        const restWord = word.slice(commonIndex);
+        const restWordNode = new PatriciaNode(restWord);
+        value.children.push(restWordNode);
+
+        // this.add(childWord, value, ++sublnt);
         return;
       }
     });
 
-    //initial case where sublnt is 0
-    if (sublnt === 0) {
-      const initNode = new PatriciaNode(word[0]);
-      current.children.set(word[0], initNode);
-      this.add(word.slice(1), initNode, ++sublnt);
-    } else if ((isLeaf && word) || !isMatched) {
-      // this case refer the current root has no child to compare further so add in the list
-      const children = new PatriciaNode(word);
-      children.eow = true;
-      current.children.set(word, children);
+    if (!isMatched) {
+      const initNode = new PatriciaNode(word);
+      current.children.push(initNode);
     }
   }
 
@@ -66,29 +78,29 @@ t.add("app");
 t.add("apple");
 t.add("api");
 t.add("application");
-// t.add("applause");
-// t.add("appetite");
-// t.add("triple");
-// t.add("trap");
-// t.add("apple");
-// t.add("appraise");
-// t.add("apparatus");
-// t.add("appendix");
-// t.add("apprentice");
-// t.add("appoint");
-// t.add("mumbai");
-// t.add("bottle");
-// t.add("dsa");
-// t.add("surajit");
-// t.add("javascript");
-// t.add("god");
-// t.add("pens");
+t.add("applause");
+t.add("appetite");
+t.add("triple");
+t.add("trap");
+t.add("apple");
+t.add("appraise");
+t.add("apparatus");
+t.add("appendix");
+t.add("apprentice");
+t.add("appoint");
+t.add("mumbai");
+t.add("bottle");
+t.add("dsa");
+t.add("surajit");
+t.add("javascript");
+t.add("god");
+t.add("pens");
 
 function getChilds(root: TPatriciaTrieNode, pStr = "") {
   if (root.eow) {
     console.log("object :>> ", pStr + root.prefix);
   }
-  if (root.children.size === 0) return;
+  if (root.children.length === 0) return;
   root.children.forEach((value) => {
     getChilds(value, pStr + root.prefix);
   });
