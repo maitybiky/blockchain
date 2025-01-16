@@ -1,18 +1,18 @@
 type TPatriciaTrieNode = {
   prefix: string;
-  children: TPatriciaTrieNode[];
+  children: Map<string, TPatriciaTrieNode>;
   eow: boolean;
 };
 
 class PatriciaNode implements TPatriciaTrieNode {
   prefix: string;
-  children: TPatriciaTrieNode[];
+  children: Map<string, TPatriciaTrieNode>;
   eow: boolean;
 
   constructor(prefix = "") {
     this.prefix = prefix;
-    this.children = [];
-    this.eow = false;
+    this.children = new Map();
+    this.eow = true;
   }
 }
 
@@ -21,18 +21,13 @@ class Trie {
   constructor() {
     this.root = new PatriciaNode();
   }
-  add(word: string, root = this.root) {
-    let current = root || this.root;
-    console.log("word :>> ", word);
+  add(word: string) {
+    let current = this.root;
 
     let isMatched = false;
     // if current root has children the sent the uncommon string to childs
-    current.children.forEach((value) => {
-      const key = value.prefix;
+    current.children.forEach((value, key) => {
       const commonIndex = this.getCommonPrefixLength(key, word);
-      if (word === "application") {
-        console.log("commonIndex,value :>> ", commonIndex, key.length, value);
-      }
       if (commonIndex > 0) {
         // if new word have some common in the existing tree
         isMatched = true;
@@ -43,28 +38,50 @@ class Trie {
           const commonPrefix = key.slice(0, commonIndex);
           const restKey = key.slice(commonIndex);
 
-          const restKeyNode = new PatriciaNode(restKey);
+          // Update the map key
+          const childNode = current.children.get(key);
+          current.children.delete(key);
+          childNode!.prefix = commonPrefix;
+          childNode!.eow = false;
+          current.children.set(commonPrefix, childNode!);
 
-          //change the matched child node
-          value.children.push(restKeyNode);
-          value.prefix = commonPrefix;
+          //push the rest word to the children
+          const restKeyNode = new PatriciaNode(restKey);
+          value.children.set(restKey, restKeyNode);
         }
 
+        // if new word completly matched with existing node
         const restWord = word.slice(commonIndex);
         const restWordNode = new PatriciaNode(restWord);
-        value.children.push(restWordNode);
+        value.children.set(restWord, restWordNode);
 
         // this.add(childWord, value, ++sublnt);
         return;
+      }
+      if (key.length === commonIndex) {
+        value.eow = true;
       }
     });
 
     if (!isMatched) {
       const initNode = new PatriciaNode(word);
-      current.children.push(initNode);
+      current.children.set(word, initNode);
     }
   }
 
+  search(word: string, s: string[] = [], node: PatriciaNode = this.root) {
+    const suggetions: string[] = [...s];
+    const current = node || this.root;
+    current.children.forEach((value, key) => {
+      const commonPrefix = this.getCommonPrefixLength(key, word);
+      if (commonPrefix > 0) {
+        value.children.forEach((childvalue) => {
+          if (childvalue.eow) suggetions.push(value.prefix + childvalue.prefix);
+        });
+      }
+    });
+    console.log("suggetions :>> ", suggetions);
+  }
   getCommonPrefixLength(word1: string, word2: string): number {
     let i = 0;
     while (word1.length > i && word2.length > i && word1[i] === word2[i]) {
@@ -95,12 +112,14 @@ t.add("surajit");
 t.add("javascript");
 t.add("god");
 t.add("pens");
+t.add("ap");
+t.search("app");
 
 function getChilds(root: TPatriciaTrieNode, pStr = "") {
   if (root.eow) {
     console.log("object :>> ", pStr + root.prefix);
   }
-  if (root.children.length === 0) return;
+  if (root.children.size === 0) return;
   root.children.forEach((value) => {
     getChilds(value, pStr + root.prefix);
   });
