@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { IBlockchain } from "../blockchain/BlockChain/type";
 type Store = {
   myPeerId: string | undefined;
   setOwnPeerId: (peerId: string) => void;
@@ -10,6 +11,8 @@ type Store = {
   dataChannels: Record<string, RTCDataChannel>;
   addDataChannel: (peerId: string, channel: RTCDataChannel) => void;
   removeDataChannel: (peerId: string) => void;
+  chain: IBlockchain;
+  updateChain: (chain: IBlockchain) => void;
 };
 
 const networkStore = create<Store>()(
@@ -20,7 +23,6 @@ const networkStore = create<Store>()(
     peerConnections: {},
 
     addConnection: (peerId, connection) => {
-      
       return set((state) => ({
         peerConnections: { ...state.peerConnections, [peerId]: connection },
       }));
@@ -45,6 +47,7 @@ const networkStore = create<Store>()(
         const { [peerId]: _, ...updatedChannels } = state.dataChannels;
         return { dataChannels: updatedChannels };
       }),
+    updateChain: (chain: IBlockchain) => set(() => ({ chain })),
   }))
 );
 

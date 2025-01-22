@@ -77,8 +77,7 @@ export async function signData(
   privateKeyBase64: string,
   data: string
 ): Promise<Uint8Array> {
-  try {
-    console.log('data', data)
+try {
     const privateKey = await importPrivateKey(privateKeyBase64);
 
     const encoder = new TextEncoder();
@@ -105,7 +104,6 @@ export async function verifySignature(
   signature: Uint8Array
 ): Promise<boolean> {
   try {
-    console.log('verify data', data)
     const publicKey = await importPublicKey(publicKeyBase64);
 
     const encoder = new TextEncoder();

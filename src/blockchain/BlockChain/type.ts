@@ -9,8 +9,9 @@ export interface IBlockchain {
   getLatestBlock(): IBlock | Pick<IBlock, "hash">;
   getDifficulty(): number;
   getNonce(): number;
+  serializeChain(data: Partial<IBlockchain>): IBlockchain;
 }
 export type BlockChainArg = {
-  difficulty: number;
-  nonce: number;
+  difficulty?: number;
+  nonce?: number;
 };

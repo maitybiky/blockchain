@@ -1,9 +1,8 @@
 import Account from "../../AccountModel";
 import { IAccountModel } from "../../AccountModel/type";
-import { updateChain } from "../../blockchainstate";
 import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
-
+import networkStore from "../../state/store";
 import { BlockChainArg, IBlockchain } from "./type";
 
 // Blockchain class implementing the interface
@@ -14,13 +13,17 @@ class Blockchain implements IBlockchain {
   private difficulty: number;
   private nonce: number;
 
-  constructor({ difficulty, nonce }: BlockChainArg) {
+  constructor({ difficulty = 10, nonce = 0 }: BlockChainArg) {
     this.chain = [];
     this.difficulty = difficulty;
     this.nonce = nonce;
     this.account = Account.getTheAccount();
   }
-
+  serializeChain(data: Partial<IBlockchain>) {
+    const instance = new Blockchain({});
+    Object.assign(instance, data);
+    return instance;
+  }
   static getBlockChain() {
     return (
       Blockchain.instance || new Blockchain({ difficulty: 10, nonce: 111 })
@@ -61,8 +64,8 @@ class Blockchain implements IBlockchain {
           newBlock.previousHash = this.getLatestBlock().hash;
           // newBlock.
           this.chain.push(newBlock);
-          updateChain(this.chain)
-          console.log("this.account", this.account);
+          const { updateChain } = networkStore.getState();
+          updateChain(this);
         } catch (error) {
           throw error;
         }
