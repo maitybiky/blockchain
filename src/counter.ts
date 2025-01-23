@@ -44,17 +44,21 @@ class Trie {
           // break the existing key and add the rest of the unmatch as its child
         
           const matchedNode = current.children.get(key);
+          console.log('current.children bd :>> ', current.children);
           current.children.delete(key);
+          console.log('current.children ad :>> ', current.children);
+
           matchedNode!.prefix = commonPrefix;
           matchedNode!.eow = false;
-          console.log('matchedNode :>> ', matchedNode?.prefix);
+     console.log('matchedNode :>> ', matchedNode);
           current.children.set(commonPrefix, matchedNode!);
+          console.log('current.children am :>> ', current.children);
 
           this.add(restKey, matchedNode);
           this.add(restWord, matchedNode);
         }
         if (key.length === commonIndex) {
-          console.log('value.prefix :>> ', value.prefix);
+
           this.add(restWord, value);
           value.eow = true;
         }
@@ -65,6 +69,7 @@ class Trie {
     if (!isMatched) {
       const initNode = new PatriciaNode(word);
       initNode.eow = true;
+      console.log('initNode :>> ', initNode);
       current.children.set(word, initNode);
     }
   }
@@ -92,12 +97,12 @@ class Trie {
 }
 const t = new Trie();
 t.add("app");
-t.add("apin");
 t.add("apil");
-t.add("api");
-t.add("apisure");
-t.add("appo");
-t.add("apple");
+// t.add("apin");
+// t.add("api");
+// t.add("apisure");
+// t.add("appo");
+// t.add("apple");
 // t.add("application");
 // t.add("applause");
 // t.add("appetite");
