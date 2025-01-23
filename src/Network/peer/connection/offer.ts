@@ -1,4 +1,4 @@
-import { logCurrentTime } from "../utility";
+import { logCurrentTime } from "../../utility";
 import createPeerConnection from "./createRemotePeerConnection";
 import { signalingServer } from "./peer";
 

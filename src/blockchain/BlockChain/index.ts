@@ -1,10 +1,9 @@
 import Account from "../../AccountModel";
 import { IAccountModel } from "../../AccountModel/type";
-import { updateChain } from "../../blockchainstate";
 import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
-
 import { BlockChainArg, IBlockchain } from "./type";
+
 
 // Blockchain class implementing the interface
 class Blockchain implements IBlockchain {
@@ -14,17 +13,22 @@ class Blockchain implements IBlockchain {
   private difficulty: number;
   private nonce: number;
 
-  constructor({ difficulty, nonce }: BlockChainArg) {
+  private constructor({ difficulty = 10, nonce = 0 }: BlockChainArg) {
     this.chain = [];
     this.difficulty = difficulty;
     this.nonce = nonce;
     this.account = Account.getTheAccount();
   }
+  serializeChain(data: Partial<IBlockchain>) {
+    // this update the local blockchain instance (single) with plain object
+    Object.assign(this, data);
+  }
 
   static getBlockChain() {
-    return (
-      Blockchain.instance || new Blockchain({ difficulty: 10, nonce: 111 })
-    );
+    if (!Blockchain.instance) {
+      Blockchain.instance = new Blockchain({ difficulty: 10, nonce: 0 });
+    }
+    return Blockchain.instance;
   }
   // Adds a new block to the blockchain
   async addBlock(newBlock: IBlock): Promise<void> {
@@ -59,10 +63,12 @@ class Blockchain implements IBlockchain {
           }
           await Promise.all(accountIdsPromise);
           newBlock.previousHash = this.getLatestBlock().hash;
-          // newBlock.
+
+          //------------------------------------------------------------------------------------ ⛏️🔗💥 pushing block 🌍💸
+
           this.chain.push(newBlock);
-          updateChain(this.chain)
-          console.log("this.account", this.account);
+          this.nonce++;
+
         } catch (error) {
           throw error;
         }

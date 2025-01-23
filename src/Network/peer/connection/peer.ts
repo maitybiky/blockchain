@@ -1,9 +1,9 @@
-import { logCurrentTime } from "../utility";
+import { logCurrentTime } from "../../utility";
 import createPeerConnection from "./createRemotePeerConnection";
 import { handleOfferReceive } from "./offer";
-import { getChainReq } from "./sendRequests";
-import { getConnection } from "../../state/getter";
-import networkStore from "../../state/store";
+import { getConnection } from "../../../state/getter";
+import networkStore from "../../../state/networkstore";
+import { getChainReq } from "../gossips/request/reqFullChain";
 
 function connectToNetwork() {
   const { myPeerId, setOwnPeerId } = networkStore.getState();

@@ -5,5 +5,5 @@ export function logCurrentTime(msg:string) {
   const seconds = now.getSeconds();
   const milliseconds = now.getMilliseconds();
 
-  console.log(`${msg} - ${minutes}:${seconds}:${milliseconds}`);
+  // console.log(`${msg} - ${minutes}:${seconds}:${milliseconds}`);
 }

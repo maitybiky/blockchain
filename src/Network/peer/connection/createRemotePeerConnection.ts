@@ -1,7 +1,10 @@
-import networkStore from "../../state/store";
-import { logCurrentTime } from "../utility";
+// import networkStore from "../../state/networkstore";
+import networkStore from "../../../state/networkstore";
+import { logCurrentTime } from "../../utility";
+import { listenEvents } from "../gossips/events";
+
 import { signalingServer } from "./peer";
-import { receiveRequest } from "./receiveRequest";
+
 
 function createPeerConnection(peerId: string) {
   const { addConnection, addDataChannel } = networkStore.getState()
@@ -32,7 +35,7 @@ function createPeerConnection(peerId: string) {
 
   const dataChannel = pc.createDataChannel("mesh");
   dataChannel.onopen = () => {};
-  dataChannel.onmessage = (e) => receiveRequest(e);
+  dataChannel.onmessage = (e) => listenEvents(e);
   addConnection(peerId, pc);
 
   return pc;

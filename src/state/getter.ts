@@ -1,4 +1,4 @@
-import networkStore from "./store";
+import networkStore from "./networkstore";
 
 export const getConnection = (
   peerId: string

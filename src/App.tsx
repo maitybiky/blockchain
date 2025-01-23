@@ -1,35 +1,54 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useEffect, useState } from "react";
 import "./App.css";
-import { useEffect } from "react";
-import networkStore from "./state/store";
+import { main, mempool, processMempool } from "./main";
+// import networkStore from "./state/networkstore";
+import { IBlockchain } from "./blockchain/BlockChain/type";
+import { ITransaction } from "./blockchain/Transaction/type";
+import connectToNetwork from "./Network/peer/connection/peer";
+import Blockchain from "./blockchain/BlockChain";
 
 function App() {
-  const { dataChannels, peerConnections } = networkStore();
-  useEffect(() => {
-    setTimeout(() => {
-      console.log(
-        "dataChannels, peerConnections :>> ",
-        dataChannels,
-        peerConnections
-      );
-    }, 5000);
+  const [chain, setChain] = useState<IBlockchain>(() => {
+    return Blockchain.getBlockChain();
   });
+
+  const [memPool, setMempool] = useState<ITransaction[]>([]);
+
+  useEffect(() => {
+    connectToNetwork();
+
+    main().then(async () => {
+      setMempool(mempool.getAllTransactions());
+    });
+  }, []);
+
+  const startMining = async () => {
+    try {
+      await processMempool();
+      setChain(Blockchain.getBlockChain());
+      setMempool(mempool.getAllTransactions());
+    } catch (error) {
+      console.log("MemPool error", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("memPool", memPool);
+  }, [memPool]);
+
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>Mem Pool</h1>
+      <div className="mempool_container">
+        {memPool.map((transaction) => {
+          return <button>{transaction.getAmount()}</button>;
+        })}
       </div>
-      <h1>Vite + React</h1>
 
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <button onClick={startMining}>start mining</button>
+      {chain.getChain().map((block) => {
+        return <button>{block.hash?.slice(0, 9)}...</button>;
+      })}
     </>
   );
 }
