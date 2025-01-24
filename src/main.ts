@@ -13,6 +13,7 @@ export const mempool = Mempool.getTheMemPool();
 export const blockchain = Blockchain.getBlockChain();
 
 export const main = async () => {
+  return
   try {
     console.log("Welcome TO BC");
 
@@ -27,7 +28,6 @@ export const main = async () => {
     await biky.active();
     const rock = new Wallet("rock");
     await rock.active();
-    account.getAllWalletBalance();
 
     // split money from air
     // await blockchain.pushGenesisBlock(genesis);

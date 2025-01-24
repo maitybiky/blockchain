@@ -6,8 +6,11 @@ import { IBlockchain } from "./blockchain/BlockChain/type";
 import { ITransaction } from "./blockchain/Transaction/type";
 import connectToNetwork from "./Network/peer/connection/peer";
 import Blockchain from "./blockchain/BlockChain";
+import Mempool from "./blockchain/Mempool";
+import CreateWallet from "./pages/CreateWallet/Index";
 
 function App() {
+  const [walletPage, setWalletPage] = useState(false);
   const [chain, setChain] = useState<IBlockchain>(() => {
     return Blockchain.getBlockChain();
   });
@@ -18,7 +21,7 @@ function App() {
     connectToNetwork();
 
     main().then(async () => {
-      setMempool(mempool.getAllTransactions());
+      setMempool(Mempool.getTheMemPool().getAllTransactions());
     });
   }, []);
 
@@ -36,8 +39,16 @@ function App() {
     console.log("memPool", memPool);
   }, [memPool]);
 
+  // jsx
+
+  if (walletPage) {
+    return <CreateWallet />;
+  }
   return (
     <>
+      <h1>
+        <button onClick={() => setWalletPage(true)}>Wallet</button>
+      </h1>
       <h1>Mem Pool</h1>
       <div className="mempool_container">
         {memPool.map((transaction) => {

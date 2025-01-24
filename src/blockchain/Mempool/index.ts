@@ -10,7 +10,10 @@ class Mempool implements IMempool {
   }
 
   static getTheMemPool() {
-    return Mempool.instance || new Mempool();
+    if(!Mempool.instance){
+      Mempool.instance = new Mempool();
+    }
+    return Mempool.instance 
   }
   // Method to add a transaction to the mempool
   async addTransaction(transaction: ITransaction): Promise<void> {

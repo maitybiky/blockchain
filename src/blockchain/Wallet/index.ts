@@ -19,7 +19,10 @@ class Wallet implements IWallet {
     this.publicKey = "";
     this.walletId = "";
   }
-
+   serializeWallet(data: Partial<IWallet>) {
+    // this update the local blockchain instance (single) with plain object
+    Object.assign(this, data);
+  }
   async createKeyValuePair(): Promise<RKeyPair> {
     try {
       const { privateKey, publicKey } = await generateKeyPair();
@@ -39,7 +42,7 @@ class Wallet implements IWallet {
       this.privateKey = keyPair.privateKey;
       this.publicKey = keyPair.publicKey;
       this.walletId = await this.genWalletId(this.publicKey);
-      
+
       Account.getTheAccount().createAccount(this);
     } catch (error) {
       throw error;

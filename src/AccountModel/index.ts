@@ -16,12 +16,10 @@ class Account implements IAccountModel {
     return Account.instance;
   }
   createAccount(wallet: IWallet) {
-    const isGenesisAccount = wallet.getUserName() === "genesis";
-
     const walletId = wallet.getWalletId();
     if (!walletId) return;
     this.accounts.set(walletId, {
-      balance: isGenesisAccount ? 1000 : 0,
+      balance: 100,
       nonce: 0,
       metaData: {
         userName: wallet.getUserName(),
