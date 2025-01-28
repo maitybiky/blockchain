@@ -7,7 +7,9 @@ import { ITransaction } from "./blockchain/Transaction/type";
 import connectToNetwork from "./Network/peer/connection/peer";
 import Blockchain from "./blockchain/BlockChain";
 import Mempool from "./blockchain/Mempool";
-import CreateWallet from "./pages/CreateWallet/Index";
+import CreateWallet from "./Component/Wallet/CreateWallet/Index";
+import accountStore from "./state/accountStore";
+import NavBar from "./Component/NavigationBar/NavBar";
 
 function App() {
   const [walletPage, setWalletPage] = useState(false);
@@ -16,7 +18,7 @@ function App() {
   });
 
   const [memPool, setMempool] = useState<ITransaction[]>([]);
-
+  const acc = accountStore().account;
   useEffect(() => {
     connectToNetwork();
 
@@ -37,7 +39,8 @@ function App() {
 
   useEffect(() => {
     console.log("memPool", memPool);
-  }, [memPool]);
+    console.log("account", acc);
+  }, [memPool, acc]);
 
   // jsx
 
@@ -60,6 +63,7 @@ function App() {
       {chain.getChain().map((block) => {
         return <button>{block.hash?.slice(0, 9)}...</button>;
       })}
+      <NavBar />
     </>
   );
 }

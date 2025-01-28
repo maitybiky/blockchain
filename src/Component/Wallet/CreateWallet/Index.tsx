@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "./index.css";
-import Wallet from "../../blockchain/Wallet";
-import walletStore from "../../state/wallet";
-import { IWallet } from "../../blockchain/Wallet/type";
-import { getWallets } from "../../state/getter";
-import WalletCard from "../../blockchain/Wallet/WalletCard";
-import { account } from "../../main";
+import Wallet from "../../../blockchain/Wallet";
+import walletStore from "../../../state/wallet";
+import { IWallet } from "../../../blockchain/Wallet/type";
+import { getWallets } from "../../../state/getter";
+import WalletCard from "../Card/WalletCard";
+import Account from "../../../AccountModel";
 
 const CreateWallet: React.FC = () => {
   const { setWallet } = walletStore();
@@ -25,6 +25,7 @@ const CreateWallet: React.FC = () => {
       await newWallet.active(); // Activate wallet (generate keys, ID, etc.)
 
       setWallet(newWallet); // Set wallet in state
+      setWallets(getWallets())
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to create wallet");
     } finally {
@@ -32,6 +33,7 @@ const CreateWallet: React.FC = () => {
     }
   };
   console.log("wallets :>> ", wallets);
+  console.log("wallets  bb:>> ", Account.getTheAccount().getAllWalletBalance());
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "1rem" }}>
       <h1>Create a Wallet</h1>
@@ -70,20 +72,7 @@ const CreateWallet: React.FC = () => {
         {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
       </>
       {wallets.map((wallet) => {
-        const walletId = wallet.getWalletId();
-        if (!walletId) return;
-        const balance = account.getWalletBalance(walletId);
-        const userName = wallet.getUserName();
-        const walletAddress = wallet.getWalletId();
-
-        if (Number.isInteger(balance) && userName && walletAddress)
-          return (
-            <WalletCard
-              userName={userName}
-              balance={balance}
-              walletAddress={walletAddress}
-            />
-          );
+        return <WalletCard wallet={wallet} />;
       })}
     </div>
   );

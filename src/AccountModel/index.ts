@@ -1,5 +1,7 @@
 import { IWallet } from "../blockchain/Wallet/type";
+import accountStore from "../state/accountStore";
 import { AccountSet, AccountUpdateArgs, IAccountModel } from "./type";
+const { setAccount } = accountStore.getState();
 
 class Account implements IAccountModel {
   private static instance: Account;
@@ -15,6 +17,10 @@ class Account implements IAccountModel {
     }
     return Account.instance;
   }
+  serializeAccount(data: AccountSet) {
+    console.log('data :>> ', data);
+    this.accounts = data;
+  }
   createAccount(wallet: IWallet) {
     const walletId = wallet.getWalletId();
     if (!walletId) return;
@@ -25,6 +31,7 @@ class Account implements IAccountModel {
         userName: wallet.getUserName(),
       },
     });
+    setAccount(this.accounts);
   }
   creditCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs {
     const account = this.accounts.get(walletId);
@@ -41,6 +48,8 @@ class Account implements IAccountModel {
     let nonce = account?.nonce + 1;
 
     this.accounts.set(walletId, { ...account, balance, nonce });
+    setAccount(this.accounts);
+
     return {
       walletId,
       amount: balance,
@@ -63,7 +72,7 @@ class Account implements IAccountModel {
       nonce,
     });
     this.accounts.set(walletId, { ...account, balance, nonce });
-
+    setAccount(this.accounts);
     return {
       walletId,
       amount: balance,

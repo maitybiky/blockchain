@@ -5,6 +5,7 @@ import Mempool from "./blockchain/Mempool";
 import Transaction from "./blockchain/Transaction";
 import Wallet from "./blockchain/Wallet";
 import { IWallet } from "./blockchain/Wallet/type";
+import { serializeClasses } from "./state/serializeClasses";
 // import t from "./counter.js";
 import "./style.css";
 
@@ -13,7 +14,8 @@ export const mempool = Mempool.getTheMemPool();
 export const blockchain = Blockchain.getBlockChain();
 
 export const main = async () => {
-  return
+  serializeClasses();
+  return;
   try {
     console.log("Welcome TO BC");
 

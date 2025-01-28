@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./WalletCard.css";
-import CopyButton from "../../CommonComponent/CopyBtn";
+import CopyButton from "../../../CommonComponent/CopyBtn";
+import { IWallet } from "../../../blockchain/Wallet/type";
+import { account } from "../../../main";
 
 interface WalletCardProps {
-  balance: number;
-  userName: string;
-  walletAddress: string;
+  wallet: IWallet;
 }
 
-const WalletCard: React.FC<WalletCardProps> = ({
-  balance,
-  walletAddress,
-  userName,
-}) => {
+const WalletCard: React.FC<WalletCardProps> = ({ wallet }) => {
+  const [balance, setBalance] = useState<string>();
+  const [userName, setUserName] = useState<string>();
+  const [walletAddress, setWalletAdress] = useState<string>();
+
+  useEffect(() => {
+    const walletId = wallet.getWalletId();
+    if (!walletId) return;
+    const _balance = account.getWalletBalance(walletId);
+    setBalance(_balance.toString());
+    const _userName = wallet.getUserName();
+    setUserName(_userName);
+    const _walletAddress = wallet.getWalletId();
+    setWalletAdress(_walletAddress || "");
+  }, []);
+
+  if (!walletAddress) {
+    return;
+  }
   return (
     <div className="e-card playing">
       <div className="image"></div>
@@ -48,6 +62,8 @@ const WalletCard: React.FC<WalletCardProps> = ({
         </svg>
         <br />
         {userName}
+        <br />
+        {balance && <span>{balance}</span>}
         <br />
         <div className="name">
           <CopyButton text={walletAddress} />
