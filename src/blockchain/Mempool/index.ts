@@ -4,10 +4,10 @@ import { IMempool } from "./type";
 
 class Mempool implements IMempool {
   private static instance: Mempool;
-  private transactions: Map<string, TransactionData>;
+  private transactions: Record<string, TransactionData>;
 
   private constructor() {
-    this.transactions = new Map<string, TransactionData>();
+    this.transactions = {};
   }
 
   static getTheMemPool() {
@@ -23,37 +23,37 @@ class Mempool implements IMempool {
   // Method to add a transaction to the mempool
   async addTransaction(transaction: TransactionData) {
     const txHash = transaction.hash;
-    if (!this.transactions.has(txHash)) {
-      this.transactions.set(txHash, transaction);
+    if (!this.transactions[txHash]) {
+      this.transactions[txHash] = transaction;
     } else {
     }
-    
+
     const { updateMemPool } = mempoolStore.getState();
     updateMemPool(this);
   }
 
   // Method to remove a transaction from the mempool
   removeTransaction(txId: string): void {
-    if (this.transactions.has(txId)) {
-      this.transactions.delete(txId);
+    if (this.transactions[txId]) {
+      delete this.transactions[txId];
     } else {
     }
   }
 
   // Method to get all transactions in the mempool
   getAllTransactions(): TransactionData[] {
-    return Array.from(this.transactions.values());
+    return Object.values(this.transactions);
   }
 
   // Method to clear the mempool (e.g., after transactions are mined)
   clearMempool(): void {
-    this.transactions.clear();
+    this.transactions = {};
     console.log("Mempool cleared.");
   }
 
   // Method to get the size of the mempool
   getSize(): number {
-    return this.transactions.size;
+    return Object.keys(this.transactions).length;
   }
 }
 export default Mempool;

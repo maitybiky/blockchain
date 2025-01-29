@@ -37,46 +37,58 @@ class Block implements IBlock {
   }
   private async verifyTransactions(): Promise<TransactionData[]> {
     try {
-      if (!this.transactions.every((it) => it.signature))
+      if (!this.transactions.every((it) => it.signature)) {
         throw new Error("Signature not found");
-
+      }
+  
       const verifyPromise = this.transactions.map(async (transaction) => {
-        const transactionSigntaure = transaction.signature;
-        if (transactionSigntaure) {
+        console.log("transaction :>> ", transaction);
+        const transactionSignature = transaction.signature; // Fixed typo
+  
+        if (transactionSignature) {
           const data = transaction.toString();
-          return {
-            transaction,
-            status: await verifySignature(
+          try {
+            const status = await verifySignature(
               transaction.sender,
               data,
-              transactionSigntaure
-            ),
-          };
+              transactionSignature
+            );
+            return { transaction, status };
+          } catch (err) {
+            console.error("Error verifying signature:", err);
+            return undefined; // Ensure failed ones are removed
+          }
         }
+        return undefined; // Explicitly return undefined for filtering
       });
+  
       const verifyStatus = (await Promise.all(verifyPromise)).filter(
-        (it) => it != undefined
+        (it): it is { transaction: TransactionData; status: boolean } =>
+          it !== undefined
       );
+  console.log('verifyStatus :>> ', verifyStatus);
       const signatureVerified: TransactionData[] = [];
       const signatureFailed: TransactionData[] = [];
-
-      verifyStatus.map((txState) => {
-        if (txState.status) {
-          signatureVerified.push(txState.transaction);
+  
+      verifyStatus.forEach(({ transaction, status }) => {
+        if (status) {
+          signatureVerified.push(transaction);
         } else {
-          signatureFailed.push(txState.transaction);
+          signatureFailed.push(transaction);
         }
       });
-
+  
       signatureFailed.forEach((it) => {
         console.error("Signature Failed", it.hash);
       });
-
+  
       return signatureVerified;
     } catch (error) {
+      console.error("Error in verifyTransactions:", error);
       throw error;
     }
   }
+  
   private verifyBalance(): TransactionData[] {
     const accounts = Account.getTheAccount();
 

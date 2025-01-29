@@ -4,7 +4,6 @@ import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
 import { BlockChainArg, IBlockchain } from "./type";
 
-
 // Blockchain class implementing the interface
 class Blockchain implements IBlockchain {
   private static instance: Blockchain;
@@ -32,7 +31,7 @@ class Blockchain implements IBlockchain {
   }
   // Adds a new block to the blockchain
   async addBlock(newBlock: IBlock): Promise<void> {
-    console.log("here");
+    console.log("here",newBlock);
     // update accounts balances
 
     try {
@@ -40,20 +39,18 @@ class Blockchain implements IBlockchain {
         const accountIdsPromise = newBlock
           .getTransaction()
           .map(async (transaction) => {
-            const senderWalletId = await getAccountKey(transaction.getSender());
-            const receiverWalletId = await getAccountKey(
-              transaction.getReceiver()
-            );
+            const senderWalletId = await getAccountKey(transaction.sender);
+            const receiverWalletId = await getAccountKey(transaction.receiver);
             console.log(
-              `${senderWalletId} -> ${transaction.getAmount()} -> ${receiverWalletId}`
+              `${senderWalletId} -> ${transaction.amount} -> ${receiverWalletId}`
             );
             this.account.creditCoin({
               walletId: receiverWalletId,
-              amount: transaction.getAmount(),
+              amount: transaction.amount,
             });
             this.account.debitCoin({
               walletId: senderWalletId,
-              amount: transaction.getAmount(),
+              amount: transaction.amount,
             });
           });
 
@@ -67,8 +64,12 @@ class Blockchain implements IBlockchain {
           //------------------------------------------------------------------------------------ ⛏️🔗💥 pushing block 🌍💸
 
           this.chain.push(newBlock);
+          console.log("this. :>> ", this.chain);
+          console.log(
+            "account :>> ",
+            Account.getTheAccount().getAllWalletBalance()
+          );
           this.nonce++;
-
         } catch (error) {
           throw error;
         }
@@ -100,11 +101,11 @@ class Blockchain implements IBlockchain {
     this.getChain().forEach((it) => {
       it.printBlockDetails();
       it.getTransaction().forEach((transaction) => {
-        balance[transaction.getSender()] =
-          (balance[transaction.getSender()] || 0) - transaction.getAmount();
+        balance[transaction.sender] =
+          (balance[transaction.sender] || 0) - transaction.amount;
 
-        balance[transaction.getReceiver()] =
-          (balance[transaction.getReceiver()] || 0) + transaction.getAmount();
+        balance[transaction.receiver] =
+          (balance[transaction.receiver] || 0) + transaction.receiver;
       });
     });
   }

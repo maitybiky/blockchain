@@ -13,19 +13,19 @@ export interface ITransaction {
 
   getTimestamp(): number;
 
-  getSignature(): Uint8Array | null;
+  getSignature(): string | null;
 
   getHash(): Promise<string>;
 
   toString(): string;
-  signTransaction(privateKey: string): Promise<ArrayBuffer>;
+  signTransaction(privateKey: string): Promise<string>;
 }
 export interface TransactionData {
   sender: string;
   receiver: string;
   amount: number;
   timestamp: number;
-  signature: Uint8Array | null;
+  signature: string | null;
   hash: string;
 }
 export type TransactionArgs = {

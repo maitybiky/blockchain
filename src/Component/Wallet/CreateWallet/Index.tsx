@@ -42,6 +42,7 @@ const CreateWallet: React.FC = () => {
         receiver: reciver,
         sender: sender.getPublicKey(),
       });
+      console.log('createTransactionRequest :>> ', createTransactionRequest);
       await createTransactionRequest.signTransaction(sender.getPrivateKey());
       broadcastTransaction(createTransactionRequest);
     } catch (error) {

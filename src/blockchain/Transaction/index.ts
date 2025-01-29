@@ -7,7 +7,7 @@ class Transaction implements ITransaction {
   private receiver: string;
   private amount: number;
   private timestamp: number;
-  private signature: Uint8Array | null;
+  private signature: string | null;
   private hash: string | null;
 
   constructor(tRequest: TransactionArgs) {
@@ -36,7 +36,7 @@ class Transaction implements ITransaction {
     return this.timestamp;
   }
 
-  public getSignature(): Uint8Array | null {
+  public getSignature(): string | null {
     return this.signature;
   }
 
@@ -61,7 +61,7 @@ class Transaction implements ITransaction {
   }
 
   // Signs the transaction and assigns the signature
-  public async signTransaction(privateKey: string): Promise<Uint8Array> {
+  public async signTransaction(privateKey: string): Promise<string> {
     const txHash = this.hash || (await this.getHash());
     this.hash = txHash;
     try {

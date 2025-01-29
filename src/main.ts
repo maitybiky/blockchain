@@ -10,7 +10,7 @@ import { serializeClasses } from "./state/serializeClasses";
 import "./style.css";
 
 export const account = Account.getTheAccount();
-export const mempool = Mempool.getTheMemPool();
+ 
 export const blockchain = Blockchain.getBlockChain();
 
 export const main = async () => {
@@ -82,13 +82,15 @@ export const main = async () => {
 
 export async function processMempool() {
   try {
+    const mempool = Mempool.getTheMemPool();
     const memPoolSize = mempool.getSize();
 
     if (memPoolSize) {
-      console.log("Mempool initiated");
+      console.log("Mempool initiated",mempool);
       const mempoolProcesses = mempool
         .getAllTransactions()
         .map(async (transaction) => {
+          console.log('objecttransaction :>> ', transaction);
           const block = new Block({
             index: Date.now(),
             timestamp: Date.now(),
@@ -96,7 +98,7 @@ export async function processMempool() {
           });
 
           await block.mine();
-
+          console.log('block :>> ', block);
           await blockchain.addBlock(block);
         });
 
@@ -113,6 +115,6 @@ export async function processMempool() {
     throw error;
   } finally {
     // Resume after 5 seconds
-    setTimeout(processMempool, 5000);
+    // setTimeout(processMempool, 5000);
   }
 }

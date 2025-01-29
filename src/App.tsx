@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { main, mempool, processMempool } from "./main";
+import { main, processMempool } from "./main";
 // import networkStore from "./state/networkstore";
 import { IBlockchain } from "./blockchain/BlockChain/type";
 import { TransactionData } from "./blockchain/Transaction/type";
@@ -34,7 +34,7 @@ function App() {
     try {
       await processMempool();
       setChain(Blockchain.getBlockChain());
-      setMempoolState(mempool.getAllTransactions());
+      setMempoolState(Mempool.getTheMemPool().getAllTransactions());
     } catch (error) {
       console.log("MemPool error", error);
     }
@@ -42,7 +42,9 @@ function App() {
 
   useEffect(() => {
     // serialize mempool from the zustand then get all transaction then store to local state
-    setMempoolState(getSeriaLizedMemPool().getAllTransactions());
+    const thePool=getSeriaLizedMemPool()
+    console.log('thePool :>> ', thePool);
+    setMempoolState(thePool.getAllTransactions());
     console.log("account", acc);
   }, [memPool, acc]);
 

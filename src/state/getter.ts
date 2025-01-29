@@ -35,6 +35,8 @@ export const getWallets = (): IWallet[] => {
 
 export const getSeriaLizedMemPool = (): IMempool => {
   const mpData = mempoolStore.getState().memPool;
-  Mempool.getTheMemPool().serializeMemPool(mpData);
+  console.log('mpData :>> ', mpData);
+  if (mpData) Mempool.getTheMemPool().serializeMemPool(mpData);
+
   return Mempool.getTheMemPool();
 };

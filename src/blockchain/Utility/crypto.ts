@@ -73,57 +73,70 @@ async function importPrivateKey(base64: string): Promise<CryptoKey> {
     throw error; // Re-throw the error to be handled by the caller
   }
 }
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  return btoa(
+    Array.from(uint8Array)
+      .map((byte) => String.fromCharCode(byte))
+      .join("")
+  );
+}
+
 export async function signData(
   privateKeyBase64: string,
   data: string
-): Promise<Uint8Array> {
-try {
+): Promise<string> { // Return Base64 string instead of Uint8Array
+  try {
     const privateKey = await importPrivateKey(privateKeyBase64);
-
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
 
     const signature = await window.crypto.subtle.sign(
-      {
-        name: "RSA-PSS",
-        saltLength: 32,
-      },
+      { name: "RSA-PSS", saltLength: 32 },
       privateKey,
       dataBuffer
     );
-
-    return new Uint8Array(signature);
+console.log('mmmm1111:>> ', new Uint8Array(signature));
+    return uint8ArrayToBase64(new Uint8Array(signature)); // Convert to Base64
   } catch (error) {
     console.error("Error signing data:", error);
-    throw error; // Re-throw the error to be handled by the caller
+    throw error;
   }
 }
+function base64ToUint8Array(base64: string): Uint8Array {
+  return new Uint8Array(
+    atob(base64)
+      .split("")
+      .map((char) => char.charCodeAt(0))
+  );
+}
+
 export async function verifySignature(
   publicKeyBase64: string,
   data: string,
-  signature: Uint8Array
+  signatureBase64: string // Accept Base64 string
 ): Promise<boolean> {
   try {
     const publicKey = await importPublicKey(publicKeyBase64);
-
     const encoder = new TextEncoder();
     const dataBuffer = encoder.encode(data);
 
+    const signature = base64ToUint8Array(signatureBase64); // Convert Base64 to Uint8Array
+    console.log('mmmm222:>> ', signature);
+    console.log('publickey :>> ', publicKeyBase64);
     const isValid = await window.crypto.subtle.verify(
-      {
-        name: "RSA-PSS",
-        saltLength: 32,
-      },
+      { name: "RSA-PSS", saltLength: 32 },
       publicKey,
       signature,
       dataBuffer
     );
+console.log('isValid :>> ', isValid);
     return isValid;
   } catch (error) {
     console.error("Error verifying signature:", error);
-    return false; // Return false in case of an error
+    return false;
   }
 }
+
 
 async function importPublicKey(base64: string): Promise<CryptoKey> {
   try {
