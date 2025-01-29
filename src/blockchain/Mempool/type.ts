@@ -1,10 +1,10 @@
 
-import { ITransaction } from "../Transaction/type";
+import {  TransactionData } from "../Transaction/type";
 
 export interface IMempool {
-  addTransaction(transaction: ITransaction): void;
+  addTransaction(transaction: TransactionData): void;
   removeTransaction(txId: string): void;
-  getAllTransactions(): ITransaction[];
+  getAllTransactions(): TransactionData[];
   clearMempool(): void;
   getSize(): number;
 }

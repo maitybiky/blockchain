@@ -50,7 +50,7 @@ export const main = async () => {
           sender: sender.getPublicKey(),
         });
         await createTransactionRequest.signTransaction(sender.getPrivateKey());
-        mempool.addTransaction(createTransactionRequest);
+        // mempool.addTransaction(createTransactionRequest);
       } catch (error) {
         throw error;
       }

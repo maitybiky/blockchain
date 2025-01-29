@@ -3,13 +3,15 @@ import "./App.css";
 import { main, mempool, processMempool } from "./main";
 // import networkStore from "./state/networkstore";
 import { IBlockchain } from "./blockchain/BlockChain/type";
-import { ITransaction } from "./blockchain/Transaction/type";
+import { TransactionData } from "./blockchain/Transaction/type";
 import connectToNetwork from "./Network/peer/connection/peer";
 import Blockchain from "./blockchain/BlockChain";
 import Mempool from "./blockchain/Mempool";
 import CreateWallet from "./Component/Wallet/CreateWallet/Index";
 import accountStore from "./state/accountStore";
 import NavBar from "./Component/NavigationBar/NavBar";
+import mempoolStore from "./state/memPoolStore";
+import { getSeriaLizedMemPool } from "./state/getter";
 
 function App() {
   const [walletPage, setWalletPage] = useState(false);
@@ -17,13 +19,14 @@ function App() {
     return Blockchain.getBlockChain();
   });
 
-  const [memPool, setMempool] = useState<ITransaction[]>([]);
+  const [memPoolState, setMempoolState] = useState<TransactionData[]>([]);
+  const { memPool } = mempoolStore();
   const acc = accountStore().account;
   useEffect(() => {
     connectToNetwork();
 
     main().then(async () => {
-      setMempool(Mempool.getTheMemPool().getAllTransactions());
+      setMempoolState(Mempool.getTheMemPool().getAllTransactions());
     });
   }, []);
 
@@ -31,14 +34,15 @@ function App() {
     try {
       await processMempool();
       setChain(Blockchain.getBlockChain());
-      setMempool(mempool.getAllTransactions());
+      setMempoolState(mempool.getAllTransactions());
     } catch (error) {
       console.log("MemPool error", error);
     }
   };
 
   useEffect(() => {
-    console.log("memPool", memPool);
+    // serialize mempool from the zustand then get all transaction then store to local state
+    setMempoolState(getSeriaLizedMemPool().getAllTransactions());
     console.log("account", acc);
   }, [memPool, acc]);
 
@@ -54,8 +58,8 @@ function App() {
       </h1>
       <h1>Mem Pool</h1>
       <div className="mempool_container">
-        {memPool.map((transaction) => {
-          return <button>{transaction.getAmount()}</button>;
+        {memPoolState.map((transaction) => {
+          return <button>{transaction.amount}</button>;
         })}
       </div>
 

@@ -10,7 +10,7 @@ export const getChainReq = () => {
       }, 1000);
       return;
     }
-  
+
     for (const peerId in dataChannels) {
       console.log("peerId", peerId);
       const dataChannel = getDataChannel(peerId);

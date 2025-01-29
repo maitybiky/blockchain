@@ -1,13 +1,13 @@
 import Account from "../../AccountModel";
 import Blockchain from "../BlockChain";
-import { ITransaction } from "../Transaction/type";
+import { TransactionData } from "../Transaction/type";
 import { createHash } from "../Utility/createHash";
 import { verifySignature } from "../Utility/crypto";
 
 import { BlockArg, IBlock } from "./types";
 
 class Block implements IBlock {
-  private transactions: ITransaction[];
+  private transactions: TransactionData[];
   private isVerified: boolean;
   index: number;
   timestamp: number;
@@ -35,19 +35,19 @@ class Block implements IBlock {
       throw error;
     }
   }
-  private async verifyTransactions(): Promise<ITransaction[]> {
+  private async verifyTransactions(): Promise<TransactionData[]> {
     try {
-      if (!this.transactions.every((it) => it.getSignature()))
+      if (!this.transactions.every((it) => it.signature))
         throw new Error("Signature not found");
 
       const verifyPromise = this.transactions.map(async (transaction) => {
-        const transactionSigntaure = transaction.getSignature();
+        const transactionSigntaure = transaction.signature;
         if (transactionSigntaure) {
           const data = transaction.toString();
           return {
             transaction,
             status: await verifySignature(
-              transaction.getSender(),
+              transaction.sender,
               data,
               transactionSigntaure
             ),
@@ -57,8 +57,8 @@ class Block implements IBlock {
       const verifyStatus = (await Promise.all(verifyPromise)).filter(
         (it) => it != undefined
       );
-      const signatureVerified: ITransaction[] = [];
-      const signatureFailed: ITransaction[] = [];
+      const signatureVerified: TransactionData[] = [];
+      const signatureFailed: TransactionData[] = [];
 
       verifyStatus.map((txState) => {
         if (txState.status) {
@@ -69,7 +69,7 @@ class Block implements IBlock {
       });
 
       signatureFailed.forEach((it) => {
-        console.error("Signature Failed", it.getHash());
+        console.error("Signature Failed", it.hash);
       });
 
       return signatureVerified;
@@ -77,15 +77,15 @@ class Block implements IBlock {
       throw error;
     }
   }
-  private verifyBalance(): ITransaction[] {
+  private verifyBalance(): TransactionData[] {
     const accounts = Account.getTheAccount();
 
-    const verifiedTransactions: ITransaction[] = [];
-    const InsufficientTransaction: ITransaction[] = [];
+    const verifiedTransactions: TransactionData[] = [];
+    const InsufficientTransaction: TransactionData[] = [];
     this.transactions.map((transaction) => {
       if (
-        transaction.getAmount() >=
-        accounts.getWalletBalance(transaction.getSender())
+        transaction.amount >=
+        accounts.getWalletBalance(transaction.sender)
       ) {
         verifiedTransactions.push(transaction);
       } else {

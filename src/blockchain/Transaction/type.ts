@@ -20,6 +20,14 @@ export interface ITransaction {
   toString(): string;
   signTransaction(privateKey: string): Promise<ArrayBuffer>;
 }
+export interface TransactionData {
+  sender: string;
+  receiver: string;
+  amount: number;
+  timestamp: number;
+  signature: Uint8Array | null;
+  hash: string;
+}
 export type TransactionArgs = {
   sender: string;
   receiver: string;

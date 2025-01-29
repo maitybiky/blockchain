@@ -5,7 +5,8 @@ import walletStore from "../../../state/wallet";
 import { IWallet } from "../../../blockchain/Wallet/type";
 import { getWallets } from "../../../state/getter";
 import WalletCard from "../Card/WalletCard";
-import Account from "../../../AccountModel";
+import Transaction from "../../../blockchain/Transaction";
+import { broadcastTransaction } from "../../../Network/peer/gossips/request/broadCastTransaction";
 
 const CreateWallet: React.FC = () => {
   const { setWallet } = walletStore();
@@ -13,7 +14,8 @@ const CreateWallet: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const [sender, setSender] = useState("");
+  const [reciver, setReciver] = useState("");
   // Handle wallet creation
   const handleCreateWallet = async () => {
     setError(null);
@@ -21,19 +23,31 @@ const CreateWallet: React.FC = () => {
 
     try {
       const newWallet = new Wallet(userName); // Create Wallet instance
-      console.log("newWallet :>> ", newWallet);
       await newWallet.active(); // Activate wallet (generate keys, ID, etc.)
 
       setWallet(newWallet); // Set wallet in state
-      setWallets(getWallets())
+      setWallets(getWallets());
     } catch (err: unknown) {
       setError((err as Error).message || "Failed to create wallet");
     } finally {
       setIsLoading(false);
     }
   };
-  console.log("wallets :>> ", wallets);
-  console.log("wallets  bb:>> ", Account.getTheAccount().getAllWalletBalance());
+  const sendTransaction = async () => {
+    try {
+      const sender = wallets[0];
+      const createTransactionRequest = new Transaction({
+        amount: 20,
+        privateKey: sender.getPrivateKey(),
+        receiver: reciver,
+        sender: sender.getPublicKey(),
+      });
+      await createTransactionRequest.signTransaction(sender.getPrivateKey());
+      broadcastTransaction(createTransactionRequest);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "1rem" }}>
       <h1>Create a Wallet</h1>
@@ -71,6 +85,12 @@ const CreateWallet: React.FC = () => {
         </button>
         {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
       </>
+
+      <h1>send money</h1>
+
+      <h4>reciver</h4>
+      <input value={reciver} onChange={(e) => setReciver(e.target.value)} />
+      <button onClick={sendTransaction}>send 20</button>
       {wallets.map((wallet) => {
         return <WalletCard wallet={wallet} />;
       })}

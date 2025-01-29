@@ -1,4 +1,4 @@
-import { ITransaction } from "../Transaction/type";
+import { TransactionData } from "../Transaction/type";
 
 export interface IBlock {
   index: number; // Block number
@@ -10,16 +10,16 @@ export interface IBlock {
   difficulty: number; // Current difficulty level of mining
   mine(): void;
   printBlockDetails(): void;
-  getTransaction(): ITransaction[];
+  getTransaction(): TransactionData[];
   isVerifiedBlock(): boolean;
 }
 
 export type BlockArg = {
   index: number;
   timestamp: number;
-  transactions: ITransaction[];
+  transactions: TransactionData[];
 };
 export type VerifyReturn = {
-  transactions: ITransaction[];
+  transactions: TransactionData[];
   status: boolean;
 };

@@ -1,5 +1,8 @@
+import Mempool from "../blockchain/Mempool";
+import { IMempool } from "../blockchain/Mempool/type";
 import Wallet from "../blockchain/Wallet";
 import { IWallet } from "../blockchain/Wallet/type";
+import mempoolStore from "./memPoolStore";
 import networkStore from "./networkstore";
 import walletStore from "./wallet";
 
@@ -28,4 +31,10 @@ export const getWallets = (): IWallet[] => {
   );
   console.log("walletInstances :>> ", walletInstances);
   return walletInstances;
+};
+
+export const getSeriaLizedMemPool = (): IMempool => {
+  const mpData = mempoolStore.getState().memPool;
+  Mempool.getTheMemPool().serializeMemPool(mpData);
+  return Mempool.getTheMemPool();
 };
