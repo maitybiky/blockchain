@@ -20,6 +20,7 @@ class Account implements IAccountModel {
   serializeAccount(data: AccountSet) {
     console.log('data :>> ', data);
     this.accounts = data;
+    return Account.instance
   }
   createAccount(wallet: IWallet) {
     const walletId = wallet.getWalletId();
@@ -34,6 +35,7 @@ class Account implements IAccountModel {
     setAccount(this.accounts);
   }
   creditCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs {
+    console.log('this.accounts :>> ', this.accounts);
     const account = this.accounts.get(walletId);
     // if wallet having money for the first time [Welcome Wallet :)  ]
     if (!account) {

@@ -1,6 +1,10 @@
 import { createHash } from "../Utility/createHash";
 import { signData } from "../Utility/crypto";
-import { ITransaction, TransactionArgs } from "./type";
+import {
+  ITransaction,
+  TransactionArgs,
+  TransactionSignaturePayload,
+} from "./type";
 
 class Transaction implements ITransaction {
   private sender: string;
@@ -65,8 +69,16 @@ class Transaction implements ITransaction {
     const txHash = this.hash || (await this.getHash());
     this.hash = txHash;
     try {
-     
-      const signature = await signData(privateKey, this.toString());
+      const transactionPayload: TransactionSignaturePayload = {
+        amount: this.amount,
+        timestamp: this.timestamp,
+        receiver: this.receiver,
+        sender: this.sender,
+      };
+      const signature = await signData(
+        privateKey,
+        JSON.stringify(transactionPayload)
+      );
       this.signature = signature;
       return signature;
     } catch (error) {

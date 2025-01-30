@@ -21,6 +21,7 @@ class Blockchain implements IBlockchain {
   serializeChain(data: Partial<IBlockchain>) {
     // this update the local blockchain instance (single) with plain object
     Object.assign(this, data);
+    
   }
 
   static getBlockChain() {

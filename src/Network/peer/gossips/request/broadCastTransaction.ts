@@ -5,12 +5,12 @@ import { events } from "../events";
 
 export const broadcastTransaction = (transaction: ITransaction) => {
   const { dataChannels, myPeerId } = networkStore.getState();
-  if (Object.entries(dataChannels).length === 0) {
-    setTimeout(() => {
-      broadcastTransaction(transaction);
-    }, 1000);
-    return;
-  }
+  // if (Object.entries(dataChannels).length === 0) {
+  //   setTimeout(() => {
+  //     broadcastTransaction(transaction);
+  //   }, 1000);
+  //   return;
+  // }
 
   for (const peerId in dataChannels) {
     console.log("peerId", peerId);

@@ -5,7 +5,7 @@ export interface IAccountModel {
   // accounts: Map<string, aData>; //private
   createAccount(wallet: IWallet): any;
   getWalletBalance(walletId: string): number;
-  getAllWalletBalance(walletId: string): AccountSet;
+  getAllWalletBalance(): AccountSet;
   creditCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs;
   debitCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs;
 }

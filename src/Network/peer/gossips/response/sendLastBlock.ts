@@ -7,9 +7,9 @@ export function sendLastBlock(peerId: string) {
   const chain = Blockchain.getBlockChain();
 
   if (Object.entries(dataChannels).length === 0) {
-    setTimeout(() => {
-      sendLastBlock(peerId);
-    }, 1000);
+    // setTimeout(() => {
+    //   sendLastBlock(peerId);
+    // }, 1000);
   } else {
     const payload = {
       event: events.LAST_BLOCK_SEND,

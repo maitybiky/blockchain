@@ -28,6 +28,12 @@ export interface TransactionData {
   signature: string | null;
   hash: string;
 }
+export interface TransactionSignaturePayload {
+  amount: number;
+  timestamp: number;
+  receiver: string;
+  sender: string;
+}
 export type TransactionArgs = {
   sender: string;
   receiver: string;

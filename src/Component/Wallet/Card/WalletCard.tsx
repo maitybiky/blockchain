@@ -20,7 +20,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet }) => {
     setBalance(_balance.toString());
     const _userName = wallet.getUserName();
     setUserName(_userName);
-    const _walletAddress = wallet.getWalletId();
+    const _walletAddress = wallet.getPublicKey();
     setWalletAdress(_walletAddress || "");
   }, []);
 

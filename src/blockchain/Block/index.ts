@@ -1,6 +1,9 @@
 import Account from "../../AccountModel";
 import Blockchain from "../BlockChain";
-import { TransactionData } from "../Transaction/type";
+import {
+  TransactionData,
+  TransactionSignaturePayload,
+} from "../Transaction/type";
 import { createHash } from "../Utility/createHash";
 import { verifySignature } from "../Utility/crypto";
 
@@ -40,17 +43,22 @@ class Block implements IBlock {
       if (!this.transactions.every((it) => it.signature)) {
         throw new Error("Signature not found");
       }
-  
+
       const verifyPromise = this.transactions.map(async (transaction) => {
         console.log("transaction :>> ", transaction);
         const transactionSignature = transaction.signature; // Fixed typo
-  
+
         if (transactionSignature) {
-          const data = transaction.toString();
+          const data: TransactionSignaturePayload = {
+            amount: transaction.amount,
+            timestamp: transaction.timestamp,
+            receiver: transaction.receiver,
+            sender: transaction.sender,
+          };
           try {
             const status = await verifySignature(
               transaction.sender,
-              data,
+              JSON.stringify(data),
               transactionSignature
             );
             return { transaction, status };
@@ -61,15 +69,15 @@ class Block implements IBlock {
         }
         return undefined; // Explicitly return undefined for filtering
       });
-  
+
       const verifyStatus = (await Promise.all(verifyPromise)).filter(
         (it): it is { transaction: TransactionData; status: boolean } =>
           it !== undefined
       );
-  console.log('verifyStatus :>> ', verifyStatus);
+      console.log("verifyStatus :>> ", verifyStatus);
       const signatureVerified: TransactionData[] = [];
       const signatureFailed: TransactionData[] = [];
-  
+
       verifyStatus.forEach(({ transaction, status }) => {
         if (status) {
           signatureVerified.push(transaction);
@@ -77,28 +85,25 @@ class Block implements IBlock {
           signatureFailed.push(transaction);
         }
       });
-  
+
       signatureFailed.forEach((it) => {
         console.error("Signature Failed", it.hash);
       });
-  
+
       return signatureVerified;
     } catch (error) {
       console.error("Error in verifyTransactions:", error);
       throw error;
     }
   }
-  
+
   private verifyBalance(): TransactionData[] {
     const accounts = Account.getTheAccount();
 
     const verifiedTransactions: TransactionData[] = [];
     const InsufficientTransaction: TransactionData[] = [];
     this.transactions.map((transaction) => {
-      if (
-        transaction.amount >=
-        accounts.getWalletBalance(transaction.sender)
-      ) {
+      if (transaction.amount >= accounts.getWalletBalance(transaction.sender)) {
         verifiedTransactions.push(transaction);
       } else {
         InsufficientTransaction.push(transaction);

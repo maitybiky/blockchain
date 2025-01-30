@@ -36,13 +36,15 @@ const CreateWallet: React.FC = () => {
   const sendTransaction = async () => {
     try {
       const sender = wallets[0];
+      const reciver = wallets[2].getPublicKey();
+  
       const createTransactionRequest = new Transaction({
         amount: 20,
         privateKey: sender.getPrivateKey(),
         receiver: reciver,
         sender: sender.getPublicKey(),
       });
-      console.log('createTransactionRequest :>> ', createTransactionRequest);
+      console.log("createTransactionRequest :>> ", createTransactionRequest);
       await createTransactionRequest.signTransaction(sender.getPrivateKey());
       broadcastTransaction(createTransactionRequest);
     } catch (error) {
