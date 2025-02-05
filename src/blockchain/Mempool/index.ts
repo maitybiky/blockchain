@@ -48,6 +48,8 @@ class Mempool implements IMempool {
   // Method to clear the mempool (e.g., after transactions are mined)
   clearMempool(): void {
     this.transactions = {};
+    const { clearMemPool } = mempoolStore.getState();
+    clearMemPool();
     console.log("Mempool cleared.");
   }
 

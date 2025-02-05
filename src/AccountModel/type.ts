@@ -6,16 +6,18 @@ export interface IAccountModel {
   createAccount(wallet: IWallet): any;
   getWalletBalance(walletId: string): number;
   getAllWalletBalance(): AccountSet;
+  mergeAccount(remoteAccount: AccountSet): void;
   creditCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs;
   debitCoin({ walletId, amount }: AccountUpdateArgs): AccountUpdateArgs;
 }
-export type AccountSet = Map<string, aData>;
+export type AccountSet = Record<string, aData>;
 
 export type aData = {
   balance: number;
   nonce: number;
   metaData?: any;
 };
+
 export interface AccountUpdateArgs {
   walletId: string;
   amount: number;

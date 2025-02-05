@@ -1,4 +1,5 @@
 import Blockchain from "../../../blockchain/BlockChain";
+import { onAccountRecieve } from "./response/onAccountRec";
 import { addToMemPool } from "./response/onTransactionRec";
 import { sendChain } from "./response/sendFullChain";
 import { sendLastBlock } from "./response/sendLastBlock";
@@ -9,10 +10,11 @@ export const events = {
   LAST_BLOCK_REQUEST: "last-block-request",
   LAST_BLOCK_SEND: "send-last-block",
   TRANSACTION_BROADCAST: "broadcast-transaction",
+  ACCOUNT_BROADCAST: "broadcast-account",
 };
 export const listenEvents = (req: MessageEvent<any>) => {
   const msg = JSON.parse(req.data);
-  console.log("msg", msg);
+  console.log("events", msg);
 
   switch (msg.event) {
     case events.GET_CHAIN:
@@ -28,6 +30,9 @@ export const listenEvents = (req: MessageEvent<any>) => {
       break;
     case events.TRANSACTION_BROADCAST:
       addToMemPool(msg.transaction);
+      break;
+    case events.ACCOUNT_BROADCAST:
+      onAccountRecieve(msg.account);
       break;
 
     default:

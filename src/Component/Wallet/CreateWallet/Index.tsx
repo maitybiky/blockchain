@@ -28,6 +28,7 @@ const CreateWallet: React.FC = () => {
       setWallet(newWallet); // Set wallet in state
       setWallets(getWallets());
     } catch (err: unknown) {
+      console.log('err :>> ', err);
       setError((err as Error).message || "Failed to create wallet");
     } finally {
       setIsLoading(false);

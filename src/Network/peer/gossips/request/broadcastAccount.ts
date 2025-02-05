@@ -1,15 +1,16 @@
+import { AccountSet } from "../../../../AccountModel/type";
 import { getDataChannel } from "../../../../state/getter";
 import networkStore from "../../../../state/networkstore";
 import { events } from "../events";
 
-export const requestLastBlock = () => {
+export const broadcastAccount = (account: AccountSet) => {
   const { dataChannels, myPeerId } = networkStore.getState();
-  if (Object.entries(dataChannels).length === 0) {
-    setTimeout(() => {
-      requestLastBlock();
-    }, 1000);
-    return;
-  }
+  // if (Object.entries(dataChannels).length === 0) {
+  //   setTimeout(() => {
+  //     broadcastTransaction(transaction);
+  //   }, 1000);
+  //   return;
+  // }
 
   for (const peerId in dataChannels) {
     console.log("peerId", peerId);
@@ -17,12 +18,16 @@ export const requestLastBlock = () => {
 
     if (dataChannel && dataChannel.readyState === "open") {
       dataChannel.send(
-        JSON.stringify({ event: events.LAST_BLOCK_REQUEST, peerId: myPeerId })
+        JSON.stringify({
+          event: events.ACCOUNT_BROADCAST,
+          peerId: myPeerId,
+          account,
+        })
       );
     } else {
       console.log(`Data channel with ${peerId} is not open`);
       // setTimeout(() => {
-      //   requestLastBlock();
+      //   broadcastAccount(account);
       // }, 1000);
     }
   }

@@ -6,6 +6,7 @@ import Mempool from "../blockchain/Mempool";
 type Store = {
   memPool: IMempool | null;
   updateMemPool: (data: IMempool) => void;
+  clearMemPool: () => void;
 };
 
 const mempoolStore = create<Store>()(
@@ -14,6 +15,7 @@ const mempoolStore = create<Store>()(
       (set) => ({
         memPool: null, // Initialize with an empty object
         updateMemPool: (data: IMempool) => set(() => ({ memPool: data })),
+        clearMemPool: () => set(() => ({ memPool: null })),
       }),
       {
         name: "mempool-storage",

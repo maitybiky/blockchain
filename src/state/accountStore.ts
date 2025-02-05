@@ -13,7 +13,7 @@ const accountStore = create<Store>()(
       (set) => ({
         account: null,
         setAccount: (data: AccountSet) => {
-          const serializedMap = JSON.stringify(Object.fromEntries(data));
+          const serializedMap = JSON.stringify(data);
           return set({ account: serializedMap });
         },
       }),

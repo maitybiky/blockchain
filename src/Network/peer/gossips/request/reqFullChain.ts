@@ -22,9 +22,9 @@ export const getChainReq = () => {
         console.log(`get chain req`);
       } else {
         console.log(`Data channel with ${peerId} is not open`);
-        setTimeout(() => {
-          getChainReq();
-        }, 1000);
+        // setTimeout(() => {
+        //   getChainReq();
+        // }, 1000);
       }
     }
   };

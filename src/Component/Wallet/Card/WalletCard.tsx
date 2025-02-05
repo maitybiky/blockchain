@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./WalletCard.css";
 import CopyButton from "../../../CommonComponent/CopyBtn";
 import { IWallet } from "../../../blockchain/Wallet/type";
-import { account } from "../../../main";
+import Account from "../../../AccountModel";
 
 interface WalletCardProps {
   wallet: IWallet;
@@ -14,6 +14,8 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet }) => {
   const [walletAddress, setWalletAdress] = useState<string>();
 
   useEffect(() => {
+    const account = Account.getTheAccount()
+    console.log('account :>> ', account);
     const walletId = wallet.getWalletId();
     if (!walletId) return;
     const _balance = account.getWalletBalance(walletId);
@@ -22,7 +24,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet }) => {
     setUserName(_userName);
     const _walletAddress = wallet.getPublicKey();
     setWalletAdress(_walletAddress || "");
-  }, []);
+  }, [wallet]);
 
   if (!walletAddress) {
     return;

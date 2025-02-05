@@ -1,5 +1,6 @@
 import Account from "../../AccountModel";
 import { IAccountModel } from "../../AccountModel/type";
+import { broadcastFullChain } from "../../Network/peer/gossips/request/broadCastFullChain";
 import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
 import { BlockChainArg, IBlockchain } from "./type";
@@ -21,7 +22,6 @@ class Blockchain implements IBlockchain {
   serializeChain(data: Partial<IBlockchain>) {
     // this update the local blockchain instance (single) with plain object
     Object.assign(this, data);
-    
   }
 
   static getBlockChain() {
@@ -32,7 +32,6 @@ class Blockchain implements IBlockchain {
   }
   // Adds a new block to the blockchain
   async addBlock(newBlock: IBlock): Promise<void> {
-    console.log("here",newBlock);
     // update accounts balances
 
     try {
@@ -45,11 +44,12 @@ class Blockchain implements IBlockchain {
             console.log(
               `${senderWalletId} -> ${transaction.amount} -> ${receiverWalletId}`
             );
-            this.account.creditCoin({
+  
+            Account.getTheAccount().creditCoin({
               walletId: receiverWalletId,
               amount: transaction.amount,
             });
-            this.account.debitCoin({
+            Account.getTheAccount().debitCoin({
               walletId: senderWalletId,
               amount: transaction.amount,
             });
@@ -65,12 +65,8 @@ class Blockchain implements IBlockchain {
           //------------------------------------------------------------------------------------ ⛏️🔗💥 pushing block 🌍💸
 
           this.chain.push(newBlock);
-          console.log("this. :>> ", this.chain);
-          console.log(
-            "account :>> ",
-            Account.getTheAccount().getAllWalletBalance()
-          );
           this.nonce++;
+          broadcastFullChain()
         } catch (error) {
           throw error;
         }

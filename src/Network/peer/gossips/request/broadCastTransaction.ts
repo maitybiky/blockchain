@@ -4,6 +4,7 @@ import networkStore from "../../../../state/networkstore";
 import { events } from "../events";
 
 export const broadcastTransaction = (transaction: ITransaction) => {
+  console.log('broadcasting account')
   const { dataChannels, myPeerId } = networkStore.getState();
   // if (Object.entries(dataChannels).length === 0) {
   //   setTimeout(() => {
@@ -24,12 +25,11 @@ export const broadcastTransaction = (transaction: ITransaction) => {
           transaction,
         })
       );
-      console.log(`get chain req`);
     } else {
       console.log(`Data channel with ${peerId} is not open`);
-      setTimeout(() => {
-        broadcastTransaction(transaction);
-      }, 1000);
+      // setTimeout(() => {
+      //   broadcastTransaction(transaction);
+      // }, 1000);
     }
   }
 };

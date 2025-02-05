@@ -45,7 +45,7 @@ class Block implements IBlock {
       }
 
       const verifyPromise = this.transactions.map(async (transaction) => {
-        console.log("transaction :>> ", transaction);
+
         const transactionSignature = transaction.signature; // Fixed typo
 
         if (transactionSignature) {
@@ -74,7 +74,7 @@ class Block implements IBlock {
         (it): it is { transaction: TransactionData; status: boolean } =>
           it !== undefined
       );
-      console.log("verifyStatus :>> ", verifyStatus);
+  
       const signatureVerified: TransactionData[] = [];
       const signatureFailed: TransactionData[] = [];
 
