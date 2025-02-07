@@ -9,7 +9,7 @@ function connectToNetwork() {
   const { myPeerId, setOwnPeerId } = networkStore.getState();
   signalingServer.onmessage = async (message) => {
     const data = JSON.parse(message.data);
-
+    console.log("signaling server events", data);
     if (data.type === "peer_coonection") {
       // Server assigns a unique ID to this peer
       const youPeerId = data.id;

@@ -16,10 +16,6 @@ export const getDataChannel = (peerId: string): RTCDataChannel | undefined => {
 };
 
 export const getWallets = (): IWallet[] => {
-  console.log(
-    "walletStore.getState().myWallets :>> ",
-    walletStore.getState().myWallets
-  );
   const wallets = walletStore.getState().myWallets;
 
   const walletInstances = Object.entries(wallets).map(
@@ -29,13 +25,11 @@ export const getWallets = (): IWallet[] => {
       return walletInstance;
     }
   );
-  console.log("walletInstances :>> ", walletInstances);
   return walletInstances;
 };
 
 export const getSeriaLizedMemPool = (): IMempool => {
-  const mpData = mempoolStore.getState().memPool;
-  console.log('mpData :>> ', mpData);
+  const mpData = mempoolStore.getState().memPool; 
   if (mpData) Mempool.getTheMemPool().serializeMemPool(mpData);
 
   return Mempool.getTheMemPool();

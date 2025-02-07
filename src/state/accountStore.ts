@@ -3,7 +3,7 @@ import { devtools, persist } from "zustand/middleware";
 import { AccountSet } from "../AccountModel/type";
 
 type Store = {
-  account: string | null;
+  account: AccountSet | null;
   setAccount: (data: AccountSet) => void;
 };
 
@@ -13,8 +13,8 @@ const accountStore = create<Store>()(
       (set) => ({
         account: null,
         setAccount: (data: AccountSet) => {
-          const serializedMap = JSON.stringify(data);
-          return set({ account: serializedMap });
+          // const serializedMap = JSON.stringify(data);
+          return set({ account: data });
         },
       }),
       {

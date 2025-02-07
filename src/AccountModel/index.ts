@@ -1,5 +1,5 @@
 import { IWallet } from "../blockchain/Wallet/type";
-import { broadcastAccount } from "../Network/peer/gossips/request/broadcastAccount";
+import { broadcastAccount } from "../Network/peer/gossips/response/broadcastAccount";
 import accountStore from "../state/accountStore";
 import { AccountSet, AccountUpdateArgs, IAccountModel } from "./type";
 const { setAccount } = accountStore.getState();

@@ -1,10 +1,9 @@
-import Account from "../../../../AccountModel";
-import Blockchain from "../../../../blockchain/BlockChain";
+import { AccountSet } from "../../../../AccountModel/type";
 import { getDataChannel } from "../../../../state/getter";
 import networkStore from "../../../../state/networkstore";
 import { events } from "../events";
 
-export const broadcastAccount = () => {
+export const broadcastAccount = (account: AccountSet) => {
   const { dataChannels, myPeerId } = networkStore.getState();
   // if (Object.entries(dataChannels).length === 0) {
   //   setTimeout(() => {
@@ -22,14 +21,14 @@ export const broadcastAccount = () => {
         JSON.stringify({
           event: events.ACCOUNT_BROADCAST,
           peerId: myPeerId,
-          data: Account.getTheAccount().getAllWalletBalance(),
+          account,
         })
       );
     } else {
       console.log(`Data channel with ${peerId} is not open`);
-      //   setTimeout(() => {
-      //     broadcastFullChain(blockchain);
-      //   }, 1000);
+      // setTimeout(() => {
+      //   broadcastAccount(account);
+      // }, 1000);
     }
   }
 };

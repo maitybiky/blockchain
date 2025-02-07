@@ -43,9 +43,8 @@ function App() {
   useEffect(() => {
     // serialize mempool from the zustand then get all transaction then store to local state
     const thePool=getSeriaLizedMemPool()
-    console.log('thePool :>> ', thePool);
     setMempoolState(thePool.getAllTransactions());
-    console.log("account", acc);
+
   }, [memPool, acc]);
 
   // jsx

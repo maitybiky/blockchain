@@ -28,7 +28,7 @@ const CreateWallet: React.FC = () => {
       setWallet(newWallet); // Set wallet in state
       setWallets(getWallets());
     } catch (err: unknown) {
-      console.log('err :>> ', err);
+      console.log("err :>> ", err);
       setError((err as Error).message || "Failed to create wallet");
     } finally {
       setIsLoading(false);
@@ -36,9 +36,10 @@ const CreateWallet: React.FC = () => {
   };
   const sendTransaction = async () => {
     try {
+      if (!reciver) return alert("define reciver");
       const sender = wallets[0];
-      const reciver = wallets[2].getPublicKey();
-  
+      // const reciver = wallets[2].getPublicKey();
+
       const createTransactionRequest = new Transaction({
         amount: 20,
         privateKey: sender.getPrivateKey(),
