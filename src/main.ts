@@ -14,7 +14,7 @@ export const account = Account.getTheAccount();
 export const blockchain = Blockchain.getBlockChain();
 
 export const main = async () => {
-  serializeClasses();
+  // serializeClasses();
   return;
   try {
     console.log("Welcome TO BC");

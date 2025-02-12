@@ -15,12 +15,16 @@ class Account implements IAccountModel {
   static getTheAccount(): Account {
     if (!Account.instance) {
       Account.instance = new Account();
+      const persistedAccountData = accountStore.getState().account;
+      console.log("persistedAccountData :>> ", persistedAccountData);
+      if (persistedAccountData)
+        Account.instance.accounts = persistedAccountData;
     }
+
     return Account.instance;
   }
-  serializeAccount(data: AccountSet) {
-    this.accounts = data;
-    return Account.instance;
+  serializeAccount(data: Partial<AccountSet>) {
+    Object.assign(this, data);
   }
   mergeAccount(receivedAccounts: AccountSet) {
     for (const [key, receivedData] of Object.entries(receivedAccounts)) {
@@ -89,6 +93,7 @@ class Account implements IAccountModel {
     };
   }
   getWalletBalance(walletId: string) {
+    console.log("this.accounts :>> ", this.accounts);
     return this.accounts[walletId]?.balance || 0;
   }
   getAllWalletBalance() {

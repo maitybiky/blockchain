@@ -19,6 +19,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ wallet }) => {
     const walletId = wallet.getWalletId();
     if (!walletId) return;
     const _balance = account.getWalletBalance(walletId);
+    console.log('_balance :>> ', _balance);
     setBalance(_balance.toString());
     const _userName = wallet.getUserName();
     setUserName(_userName);

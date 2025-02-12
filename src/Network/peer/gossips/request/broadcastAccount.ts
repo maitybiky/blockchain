@@ -1,5 +1,4 @@
 import Account from "../../../../AccountModel";
-import Blockchain from "../../../../blockchain/BlockChain";
 import { getDataChannel } from "../../../../state/getter";
 import networkStore from "../../../../state/networkstore";
 import { events } from "../events";
