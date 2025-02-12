@@ -4,6 +4,7 @@ import { handleOfferReceive } from "./offer";
 import { getConnection } from "../../../state/getter";
 import networkStore from "../../../state/networkstore";
 import { getChainReq } from "../gossips/request/reqFullChain";
+import { getAccountReq } from "../gossips/request/accountRequest";
 
 function connectToNetwork() {
   const { myPeerId, setOwnPeerId } = networkStore.getState();
@@ -15,7 +16,7 @@ function connectToNetwork() {
       const youPeerId = data.id;
       if (youPeerId) {
         setOwnPeerId(youPeerId);
-        console.log("who ami i :>> ", myPeerId);
+        console.log("who ami i :>> ", youPeerId);
         // connectToPeer(myPeerId);
       } else {
         throw new Error("Peer id is null!");
@@ -41,9 +42,10 @@ function connectToNetwork() {
       } else {
         console.error("peer not found!!!");
       }
-      getChainReq();
+
     } else if (data.type === "candidate") {
       logCurrentTime("rec candidate");
+      console.log('data :>> ', data);
 
       // Received an ICE candidate
       const pc = getConnection(data.to);

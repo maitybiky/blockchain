@@ -9,6 +9,7 @@ import walletStore from "./wallet";
 export const getConnection = (
   peerId: string
 ): RTCPeerConnection | undefined => {
+  console.log('networkStore.getState().peerConnections :>> ', networkStore.getState().peerConnections);
   return networkStore.getState().peerConnections[peerId];
 };
 export const getDataChannel = (peerId: string): RTCDataChannel | undefined => {

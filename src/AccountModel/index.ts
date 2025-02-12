@@ -16,7 +16,6 @@ class Account implements IAccountModel {
     if (!Account.instance) {
       Account.instance = new Account();
       const persistedAccountData = accountStore.getState().account;
-      console.log("persistedAccountData :>> ", persistedAccountData);
       if (persistedAccountData)
         Account.instance.accounts = persistedAccountData;
     }
@@ -25,6 +24,7 @@ class Account implements IAccountModel {
   }
   serializeAccount(data: Partial<AccountSet>) {
     Object.assign(this, data);
+    setAccount(this.accounts);
   }
   mergeAccount(receivedAccounts: AccountSet) {
     for (const [key, receivedData] of Object.entries(receivedAccounts)) {
@@ -32,6 +32,7 @@ class Account implements IAccountModel {
 
       if (!localData || receivedData.nonce > localData.nonce) {
         this.accounts[key] = receivedData;
+        setAccount(this.accounts);
       }
     }
   }

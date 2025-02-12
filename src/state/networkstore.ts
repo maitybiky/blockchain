@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { getChainReq } from "../Network/peer/gossips/request/reqFullChain";
+import { getAccountReq } from "../Network/peer/gossips/request/accountRequest";
 type Store = {
   myPeerId: string | undefined;
   peerConnections: Record<string, RTCPeerConnection>;
@@ -36,9 +38,14 @@ const networkStore = create<Store>()(
     dataChannels: {},
 
     addDataChannel: (peerId, channel) =>
-      set((state) => ({
-        dataChannels: { ...state.dataChannels, [peerId]: channel },
-      })),
+      set((state) => {
+        const newDatachannels = { ...state.dataChannels, [peerId]: channel };
+        getChainReq(newDatachannels);
+        getAccountReq(newDatachannels);
+        return {
+          dataChannels: newDatachannels,
+        };
+      }),
 
     removeDataChannel: (peerId) =>
       set((state) => {

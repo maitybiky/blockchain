@@ -2,6 +2,7 @@
 import networkStore from "../../../state/networkstore";
 import { logCurrentTime } from "../../utility";
 import { listenEvents } from "../gossips/events";
+import { sendAccountState } from "../gossips/response/sendAccount";
 
 import { signalingServer } from "./peer";
 
@@ -37,6 +38,7 @@ function createPeerConnection(peerId: string) {
   dataChannel.onopen = () => {};
   dataChannel.onmessage = (e) => listenEvents(e);
   addConnection(peerId, pc);
+
 
   return pc;
 }
