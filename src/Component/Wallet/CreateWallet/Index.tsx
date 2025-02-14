@@ -8,7 +8,7 @@ import WalletCard from "../Card/WalletCard";
 import Transaction from "../../../blockchain/Transaction";
 import { broadcastTransaction } from "../../../Network/peer/gossips/request/broadCastTransaction";
 
-const CreateWallet: React.FC = () => {
+const CreateWallet: React.FC<{ closePage: () => void }> = ({ closePage }) => {
   const { setWallet } = walletStore();
   const [wallets, setWallets] = useState<IWallet[]>(getWallets());
   const [userName, setUserName] = useState<string>("");
@@ -55,6 +55,7 @@ const CreateWallet: React.FC = () => {
   };
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "1rem" }}>
+      <button onClick={closePage}>home</button>
       <h1>Create a Wallet</h1>
       <>
         <div>

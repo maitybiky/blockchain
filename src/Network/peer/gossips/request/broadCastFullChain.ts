@@ -3,6 +3,7 @@ import { getDataChannel } from "../../../../state/getter";
 import networkStore from "../../../../state/networkstore";
 import { events } from "../events";
 
+// when you add new block to chain
 export const broadcastFullChain = () => {
   const { dataChannels, myPeerId } = networkStore.getState();
   // if (Object.entries(dataChannels).length === 0) {

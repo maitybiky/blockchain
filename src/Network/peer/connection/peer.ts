@@ -42,10 +42,9 @@ function connectToNetwork() {
       } else {
         console.error("peer not found!!!");
       }
-
     } else if (data.type === "candidate") {
       logCurrentTime("rec candidate");
-      console.log('data :>> ', data);
+      console.log("data :>> ", data);
 
       // Received an ICE candidate
       const pc = getConnection(data.to);
@@ -70,7 +69,11 @@ function connectToNetwork() {
     signalingServer.send(offerPayload);
   }
 }
-export const signalingServer = new WebSocket("ws://localhost:8080");
+const signaling_server_url = `ws://${import.meta.env.VITE_API_SOCKET_IP}:${
+  import.meta.env.VITE_API_SOCKET_SERVER_PORT
+}`;
+console.log('signaling_server_url :>> ', signaling_server_url);
+export const signalingServer = new WebSocket(signaling_server_url);
 export default connectToNetwork;
 
 //connectToPeer(peerId) - to initiate process of joining the mesh [it initate your own peer whit a peer id returned from signalling server]

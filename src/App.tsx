@@ -12,6 +12,7 @@ import accountStore from "./state/accountStore";
 import NavBar from "./Component/NavigationBar/NavBar";
 import mempoolStore from "./state/memPoolStore";
 import { getSeriaLizedMemPool } from "./state/getter";
+import blockChainStore from "./state/blockchainstore";
 
 function App() {
   const [walletPage, setWalletPage] = useState(false);
@@ -21,6 +22,7 @@ function App() {
 
   const [memPoolState, setMempoolState] = useState<TransactionData[]>([]);
   const { memPool } = mempoolStore();
+  const { chain: persistedChain } = blockChainStore();
   const acc = accountStore().account;
   useEffect(() => {
     connectToNetwork();
@@ -42,15 +44,16 @@ function App() {
 
   useEffect(() => {
     // serialize mempool from the zustand then get all transaction then store to local state
-    const thePool=getSeriaLizedMemPool()
+    const thePool = getSeriaLizedMemPool();
     setMempoolState(thePool.getAllTransactions());
-
   }, [memPool, acc]);
-
+  console.log("chain :>> ", chain);
   // jsx
-
+  useEffect(() => {
+    setChain(Blockchain.getBlockChain());
+  }, [persistedChain]);
   if (walletPage) {
-    return <CreateWallet />;
+    return <CreateWallet closePage={() => setWalletPage(false)} />;
   }
   return (
     <>

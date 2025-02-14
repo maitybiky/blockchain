@@ -11,6 +11,11 @@ export interface IBlockchain {
   getNonce(): number;
   serializeChain(data: Partial<IBlockchain>): void;
 }
+export interface BlockChainObj {
+  chain: IBlock[];
+  difficulty: number;
+  nonce: number;
+}
 export type BlockChainArg = {
   difficulty?: number;
   nonce?: number;

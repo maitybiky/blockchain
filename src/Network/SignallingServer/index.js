@@ -1,8 +1,11 @@
 const WebSocket = require("ws");
-
-const server = new WebSocket.Server({
-  port: 8080,
-});
+require('dotenv').config();
+const config = {
+  host: process.env.VITE_API_SOCKET_IP,
+  port: parseInt(process.env.VITE_API_SOCKET_SERVER_PORT || 8080),
+};
+console.log("config :>> ", config);
+const server = new WebSocket.Server(config);
 const clients = [];
 const peers = [];
 
@@ -55,4 +58,4 @@ function generateRandomString(length) {
   return result;
 }
 
-console.log(`Signaling server running on localhost:8080`)
+console.log(`Signaling server running on localhost:8080`);

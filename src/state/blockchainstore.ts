@@ -1,17 +1,32 @@
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import { IBlockchain } from "../blockchain/BlockChain/type";
-import { ITransaction } from "../blockchain/Transaction/type";
+import { devtools, persist } from "zustand/middleware";
+import { BlockChainObj, IBlockchain } from "../blockchain/BlockChain/type";
 type Store = {
-  chain: IBlockchain;
+  chain: BlockChainObj | null;
   updateChain: (chain: IBlockchain) => void;
-  mempool: Map<string, ITransaction>;
+  // mempool: Map<string, ITransaction>;
 };
 
 const blockChainStore = create<Store>()(
-  devtools((set) => ({
-    updateChain: (chain: IBlockchain) => set(() => ({ chain })),
-  }))
+  devtools(
+    persist(
+      (set) => ({
+        chain: null,
+        updateChain: (chain: IBlockchain) => {
+          console.log('chain in store :>> ', chain);
+          const chainObject: BlockChainObj = {
+            chain: chain.getChain(),
+            difficulty: chain.getDifficulty(),
+            nonce: chain.getNonce(),
+          };
+          return set(() => ({ chain: chainObject }));
+        },
+      }),
+      {
+        name: "blockchain-store",
+      }
+    )
+  )
 );
 
 export default blockChainStore;

@@ -3,13 +3,14 @@ import { IAccountModel } from "../../AccountModel/type";
 import { broadcastFullChain } from "../../Network/peer/gossips/request/broadCastFullChain";
 import { IBlock } from "../Block/types";
 import { getAccountKey } from "../Utility/getAccountKey";
-import { BlockChainArg, IBlockchain } from "./type";
-
+import { BlockChainArg, BlockChainObj, IBlockchain } from "./type";
+import blockChainStore from "../../state/blockchainstore";
+const { updateChain } = blockChainStore.getState();
 // Blockchain class implementing the interface
 class Blockchain implements IBlockchain {
   private static instance: Blockchain;
   private chain: IBlock[];
-  private account: IAccountModel;
+  // private account: IAccountModel;
   private difficulty: number;
   private nonce: number;
 
@@ -17,16 +18,24 @@ class Blockchain implements IBlockchain {
     this.chain = [];
     this.difficulty = difficulty;
     this.nonce = nonce;
-    this.account = Account.getTheAccount();
+    // this.account = Account.getTheAccount();
   }
   serializeChain(data: Partial<IBlockchain>) {
     // this update the local blockchain instance (single) with plain object
     Object.assign(this, data);
+    updateChain(this);
   }
 
   static getBlockChain() {
     if (!Blockchain.instance) {
-      Blockchain.instance = new Blockchain({ difficulty: 10, nonce: 0 });
+      const { chain } = blockChainStore.getState();
+      const params: BlockChainObj = { difficulty: 10, nonce: 0, chain: [] };
+      if (chain) {
+        params.difficulty = chain.difficulty;
+        params.nonce = chain.nonce;
+      }
+      Blockchain.instance = new Blockchain(params);
+      Blockchain.instance.chain = chain?.chain || [];
     }
     return Blockchain.instance;
   }
@@ -44,7 +53,7 @@ class Blockchain implements IBlockchain {
             console.log(
               `${senderWalletId} -> ${transaction.amount} -> ${receiverWalletId}`
             );
-  
+
             Account.getTheAccount().creditCoin({
               walletId: receiverWalletId,
               amount: transaction.amount,
@@ -66,7 +75,8 @@ class Blockchain implements IBlockchain {
 
           this.chain.push(newBlock);
           this.nonce++;
-          broadcastFullChain()
+          broadcastFullChain();
+          updateChain(this);
         } catch (error) {
           throw error;
         }
