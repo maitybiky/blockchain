@@ -13,6 +13,8 @@ import NavBar from "./Component/NavigationBar/NavBar";
 import mempoolStore from "./state/memPoolStore";
 import { getSeriaLizedMemPool } from "./state/getter";
 import blockChainStore from "./state/blockchainstore";
+import Sp from "./Sp";
+import Portfolio from "./portfolio/Portfolio";
 
 function App() {
   const [walletPage, setWalletPage] = useState(false);
@@ -55,11 +57,13 @@ function App() {
   if (walletPage) {
     return <CreateWallet closePage={() => setWalletPage(false)} />;
   }
+  return <Portfolio/>
   return (
     <>
       <h1>
         <button onClick={() => setWalletPage(true)}>Wallet</button>
       </h1>
+    
       <h1>Mem Pool</h1>
       <div className="mempool_container">
         {memPoolState.map((transaction) => {

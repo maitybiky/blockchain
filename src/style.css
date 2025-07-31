@@ -62,7 +62,10 @@ h1 {
 .read-the-docs {
   color: #888;
 }
-
+canvas{
+  height: 100vh !important;
+  width: 100vw !important;
+}
 button {
   margin: 0.5rem;
   border-radius: 8px;
